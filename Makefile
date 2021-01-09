@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall --std=c99 -O0
 CLIBS = -pthread
-OBJECTS = type.o
+OBJECTS = type.o object.o
 
 %.o: src/%.c src/%.h bin
 	$(CC) -o bin/$@ -c $< $(CFLAGS)

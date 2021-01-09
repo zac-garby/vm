@@ -27,11 +27,12 @@ char *vm_show_obj(vm_obj obj) {
         return str;
     }
 
-    case VM_CHAR:
-        str = malloc(1);
-        str[0] = *((char*) obj.data);
-        str[1] = '\0';
+    case VM_CHAR: {
+        char value = *((char*) obj.data);
+        str = malloc(4);
+        sprintf(str, "'%c'", value);
         return str;
+    }
 
     default:
         printf("vm_show_obj for type %s not yet implemented!\n", vm_show_type(t));

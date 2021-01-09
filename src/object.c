@@ -14,9 +14,17 @@ vm_obj vm_new_char(char value) {
     return obj;
 }
 
-vm_obj vm_new_bool(int value) {int *data = malloc(sizeof(int));
+vm_obj vm_new_bool(int value) {
+    int *data = malloc(sizeof(int));
     *data = value ? 1 : 0;
     vm_obj obj = {VM_BOOL, data};
+    return obj;
+}
+
+vm_obj vm_new_float(double value) {
+    double *data = malloc(sizeof(double));
+    *data = value;
+    vm_obj obj = {VM_FLOAT, data};
     return obj;
 }
 
@@ -28,7 +36,7 @@ char *vm_show_obj(vm_obj obj) {
     case VM_INT: {
         int value = *((int*) obj.data);
         int len = snprintf(NULL, 0, "%d", value);
-        str = malloc(sizeof(char) * (len + 1));
+        str = malloc(len + 1);
         sprintf(str, "%d", value);
         return str;
     }
@@ -49,6 +57,14 @@ char *vm_show_obj(vm_obj obj) {
             str = malloc(5);
             strcpy(str, "true");
         }
+        return str;
+    }
+
+    case VM_FLOAT: {
+        double value = *((double*) obj.data);
+        int len = snprintf(NULL, 0, "%lf", value);
+        str = malloc(len + 1);
+        sprintf(str, "%lf", value);
         return str;
     }
 

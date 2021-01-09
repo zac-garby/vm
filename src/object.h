@@ -15,6 +15,7 @@ typedef struct vm_obj {
 vm_obj vm_new_int(int value);
 vm_obj vm_new_char(char value);
 vm_obj vm_new_bool(int value);
+vm_obj vm_new_float(double value);
 
 char *vm_show_obj(vm_obj obj);
 

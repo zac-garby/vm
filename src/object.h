@@ -12,8 +12,15 @@ typedef struct vm_obj {
     void *data;
 } vm_obj;
 
+typedef struct vm_strobj {
+    char *data; // the string's data. NOT null terminated
+    int length; // the amount of visible characters in the string
+    int capacity; // no. bytes allocated
+} vm_strobj;
+
 vm_obj vm_new_int(int value);
 vm_obj vm_new_char(char value);
+vm_obj vm_new_str(char *value);
 vm_obj vm_new_bool(int value);
 vm_obj vm_new_float(double value);
 

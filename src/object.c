@@ -14,6 +14,19 @@ vm_obj vm_new_char(char value) {
     return obj;
 }
 
+vm_obj vm_new_str(char *value) {
+    int length = (int) strlen(value);
+
+    vm_strobj *str = malloc(sizeof(vm_strobj));
+    str->data = malloc(length);
+    str->length = length;
+    str->capacity = length;
+    strncpy(str->data, value, length);
+
+    vm_obj obj = {VM_STR, str};
+    return obj;
+}
+
 vm_obj vm_new_bool(int value) {
     int *data = malloc(sizeof(int));
     *data = value ? 1 : 0;
@@ -45,6 +58,13 @@ char *vm_show_obj(vm_obj obj) {
         char value = *((char*) obj.data);
         str = malloc(4);
         sprintf(str, "'%c'", value);
+        return str;
+    }
+
+    case VM_STR: {
+        vm_strobj *strobj = (vm_strobj*) obj.data;
+        str = malloc(strobj->length + 1);
+        sprintf(str, "%.*s", strobj->length, strobj->data);
         return str;
     }
 

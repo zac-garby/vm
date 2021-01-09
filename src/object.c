@@ -41,6 +41,16 @@ vm_obj vm_new_float(double value) {
     return obj;
 }
 
+vm_obj vm_new_list(int capacity) {
+    vm_listobj *list = malloc(sizeof(vm_listobj));
+    list->data = malloc(sizeof(vm_obj*) * capacity);
+    list->length = 0;
+    list->capacity = capacity;
+
+    vm_obj obj = {VM_LIST, list};
+    return obj;
+}
+
 char *vm_show_obj(vm_obj obj) {
     vm_type t = obj.type;
     char *str;
@@ -88,8 +98,65 @@ char *vm_show_obj(vm_obj obj) {
         return str;
     }
 
+    case VM_LIST: {
+        vm_listobj *list = (vm_listobj*) obj.data;
+        int offset = 1, alloc = 16;
+        str = malloc(16);
+        sprintf(str, "[");
+
+        for (int i = 0; i < list->length; i++) {
+            vm_obj elem = *list->data[i];
+            char *elem_str = vm_show_obj(elem);
+            int elem_len = (int) strlen(elem_str);
+            int new_alloc = alloc;
+
+            while (offset + elem_len + 2 >= new_alloc) {
+                // add new memory until there's enough space for this element plus
+                // a closing bracket (and \0).
+                new_alloc += 16;
+            }
+
+            if (new_alloc != alloc) {
+                str = realloc(str, new_alloc);
+            }
+            
+            strcat(str, elem_str);
+            offset += elem_len;
+            free(elem_str);
+
+            if (i + 1 < list->length) {
+                strcat(str, ", ");
+                offset += 2;
+            }
+        }
+
+        strcat(str, "]");
+        
+        return str;
+    }
+
     default:
         printf("vm_show_obj for type %s not yet implemented!\n", vm_show_type(t));
         return NULL;
     }
+}
+
+int vm_list_append(vm_obj obj, vm_obj *elem) {
+    vm_listobj *list;
+
+    if (obj.type != VM_LIST) {
+        return 1;
+    }
+
+    list = (vm_listobj*) obj.data;
+    
+    if (list->length >= list->capacity) {
+        list->capacity += 8;
+        list->data = realloc(list->data, sizeof(vm_obj*) * list->capacity);
+    }
+
+    list->data[list->length] = elem;
+    list->length++;
+
+    return 0;
 }

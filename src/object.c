@@ -73,8 +73,8 @@ char *vm_show_obj(vm_obj obj) {
 
     case VM_STR: {
         vm_strobj *strobj = (vm_strobj*) obj.data;
-        str = malloc(strobj->length + 1);
-        sprintf(str, "%.*s", strobj->length, strobj->data);
+        str = malloc(strobj->length + 3);
+        sprintf(str, "\"%.*s\"", strobj->length, strobj->data);
         return str;
     }
 

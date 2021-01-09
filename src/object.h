@@ -8,4 +8,7 @@ typedef struct vm_obj {
     void *data;
 } vm_obj;
 
+vm_obj vm_new_int(int value);
+vm_obj vm_new_char(char value);
+
 #endif

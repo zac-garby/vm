@@ -5,20 +5,14 @@
 #include "src/object.h"
 
 int main() {
-    vm_obj *my_string = vm_new_str("Hello World");
-    vm_obj *my_int = vm_new_int(5);
-    
-    vm_obj *my_obj = vm_new_list(2);
-    
-    vm_list_append(my_obj, my_string);
-    vm_list_append(my_obj, my_int);
+    vm_obj *my_str = malloc(sizeof(vm_obj));
+    vm_new_str(my_str, "Hello, world!");
 
-    char *str1 = vm_show_obj(my_obj);
+    char *o = vm_show_obj(my_str);
+    printf("%s\n", o);
+    free(o);
 
-    printf("my_obj = %s\n", str1);
-
-    free(str1);
-    vm_free_obj(my_obj);
+    vm_free_obj(my_str);
     
     return 0;
 }

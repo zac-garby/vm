@@ -1,28 +1,22 @@
 #include "object.h"
 
-vm_obj *vm_new_int(int value) {
+void vm_new_int(vm_obj *dest, int value) {
     int *data = malloc(sizeof(int));
     *data = value;
     
-    vm_obj *obj = malloc(sizeof(vm_obj));
-    obj->type = VM_INT;
-    obj->data = data;
-    
-    return obj;
+    dest->type = VM_INT;
+    dest->data = data;
 }
 
-vm_obj *vm_new_char(char value) {
+void vm_new_char(vm_obj *dest, char value) {
     char *data = malloc(sizeof(char));
     *data = value;
     
-    vm_obj *obj = malloc(sizeof(vm_obj));
-    obj->type = VM_CHAR;
-    obj->data = data;
-    
-    return obj;
+    dest->type = VM_CHAR;
+    dest->data = data;
 }
 
-vm_obj *vm_new_str(char *value) {
+void vm_new_str(vm_obj *dest, char *value) {
     int length = (int) strlen(value);
 
     vm_strobj *str = malloc(sizeof(vm_strobj));
@@ -31,46 +25,34 @@ vm_obj *vm_new_str(char *value) {
     str->capacity = length;
     strncpy(str->data, value, length);
 
-    vm_obj *obj = malloc(sizeof(vm_obj));
-    obj->type = VM_STR;
-    obj->data = str;
-    
-    return obj;
+    dest->type = VM_STR;
+    dest->data = str;
 }
 
-vm_obj *vm_new_bool(int value) {
+void vm_new_bool(vm_obj *dest, int value) {
     int *data = malloc(sizeof(int));
     *data = value ? 1 : 0;
     
-    vm_obj *obj = malloc(sizeof(vm_obj));
-    obj->type = VM_BOOL;
-    obj->data = data;
-    
-    return obj;
+    dest->type = VM_BOOL;
+    dest->data = data;
 }
 
-vm_obj *vm_new_float(double value) {
+void vm_new_float(vm_obj *dest, double value) {
     double *data = malloc(sizeof(double));
     *data = value;
     
-    vm_obj *obj = malloc(sizeof(vm_obj));
-    obj->type = VM_FLOAT;
-    obj->data = data;
-    
-    return obj;
+    dest->type = VM_FLOAT;
+    dest->data = data;
 }
 
-vm_obj *vm_new_list(int capacity) {
+void vm_new_list(vm_obj *dest, int capacity) {
     vm_listobj *list = malloc(sizeof(vm_listobj));
     list->data = malloc(sizeof(vm_obj*) * capacity);
     list->length = 0;
     list->capacity = capacity;
 
-    vm_obj *obj = malloc(sizeof(vm_obj));
-    obj->type = VM_LIST;
-    obj->data = list;
-    
-    return obj;
+    dest->type = VM_LIST;
+    dest->data = list;
 }
 
 void vm_free_obj(vm_obj *obj) {

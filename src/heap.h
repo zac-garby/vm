@@ -13,4 +13,14 @@ typedef struct vm_heap {
     vm_obj *items;
 } vm_heap;
 
+vm_heap vm_new_heap();
+
+// store an object at the given location in the heap.
+// a shallow copy is made so the original is left intact.
+void vm_heap_store_index(vm_heap *heap, int i, vm_obj *obj);
+
+// retrieve the object at the given location in the heap.
+// will return NULL if the index is out of bounds.
+vm_obj *vm_heap_retrieve_index(vm_heap *heap, int i);
+
 #endif

@@ -3,16 +3,17 @@
 
 #include "src/type.h"
 #include "src/object.h"
+#include "src/heap.h"
 
 int main() {
-    vm_obj *my_str = malloc(sizeof(vm_obj));
-    vm_new_str(my_str, "Hello, world!");
+    vm_heap heap = vm_new_heap();
 
-    char *o = vm_show_obj(my_str);
-    printf("%s\n", o);
-    free(o);
+    vm_obj *my_string = malloc(sizeof(vm_obj));
+    vm_new_str(my_string, "Hello, world!");
+    vm_heap_store_index(&heap, 0, my_string);
 
-    vm_free_obj(my_str);
+    vm_obj *retr = vm_heap_retrieve_index(&heap, 0);
+    printf(" --> %s\n", vm_show_obj(retr));
     
     return 0;
 }

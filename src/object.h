@@ -24,15 +24,18 @@ typedef struct vm_listobj {
     int capacity; // the max possible length without allocating more memory
 } vm_listobj;
 
-vm_obj vm_new_int(int value);
-vm_obj vm_new_char(char value);
-vm_obj vm_new_str(char *value);
-vm_obj vm_new_bool(int value);
-vm_obj vm_new_float(double value);
-vm_obj vm_new_list(int capacity);
+vm_obj *vm_new_int(int value);
+vm_obj *vm_new_char(char value);
+vm_obj *vm_new_str(char *value);
+vm_obj *vm_new_bool(int value);
+vm_obj *vm_new_float(double value);
+vm_obj *vm_new_list(int capacity);
 
-char *vm_show_obj(vm_obj obj);
+// frees the memory associated with a vm_obj
+void vm_free_obj(vm_obj *obj);
 
-int vm_list_append(vm_obj list, vm_obj *elem);
+char *vm_show_obj(vm_obj *obj);
+
+int vm_list_append(vm_obj *list, vm_obj *elem);
 
 #endif

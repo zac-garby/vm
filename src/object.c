@@ -1,20 +1,28 @@
 #include "object.h"
 
-vm_obj vm_new_int(int value) {
+vm_obj *vm_new_int(int value) {
     int *data = malloc(sizeof(int));
     *data = value;
-    vm_obj obj = {VM_INT, data};
+    
+    vm_obj *obj = malloc(sizeof(vm_obj));
+    obj->type = VM_INT;
+    obj->data = data;
+    
     return obj;
 }
 
-vm_obj vm_new_char(char value) {
+vm_obj *vm_new_char(char value) {
     char *data = malloc(sizeof(char));
     *data = value;
-    vm_obj obj = {VM_CHAR, data};
+    
+    vm_obj *obj = malloc(sizeof(vm_obj));
+    obj->type = VM_CHAR;
+    obj->data = data;
+    
     return obj;
 }
 
-vm_obj vm_new_str(char *value) {
+vm_obj *vm_new_str(char *value) {
     int length = (int) strlen(value);
 
     vm_strobj *str = malloc(sizeof(vm_strobj));
@@ -23,41 +31,93 @@ vm_obj vm_new_str(char *value) {
     str->capacity = length;
     strncpy(str->data, value, length);
 
-    vm_obj obj = {VM_STR, str};
+    vm_obj *obj = malloc(sizeof(vm_obj));
+    obj->type = VM_STR;
+    obj->data = str;
+    
     return obj;
 }
 
-vm_obj vm_new_bool(int value) {
+vm_obj *vm_new_bool(int value) {
     int *data = malloc(sizeof(int));
     *data = value ? 1 : 0;
-    vm_obj obj = {VM_BOOL, data};
+    
+    vm_obj *obj = malloc(sizeof(vm_obj));
+    obj->type = VM_BOOL;
+    obj->data = data;
+    
     return obj;
 }
 
-vm_obj vm_new_float(double value) {
+vm_obj *vm_new_float(double value) {
     double *data = malloc(sizeof(double));
     *data = value;
-    vm_obj obj = {VM_FLOAT, data};
+    
+    vm_obj *obj = malloc(sizeof(vm_obj));
+    obj->type = VM_FLOAT;
+    obj->data = data;
+    
     return obj;
 }
 
-vm_obj vm_new_list(int capacity) {
+vm_obj *vm_new_list(int capacity) {
     vm_listobj *list = malloc(sizeof(vm_listobj));
     list->data = malloc(sizeof(vm_obj*) * capacity);
     list->length = 0;
     list->capacity = capacity;
 
-    vm_obj obj = {VM_LIST, list};
+    vm_obj *obj = malloc(sizeof(vm_obj));
+    obj->type = VM_LIST;
+    obj->data = list;
+    
     return obj;
 }
 
-char *vm_show_obj(vm_obj obj) {
-    vm_type t = obj.type;
+void vm_free_obj(vm_obj *obj) {
+    vm_type t = obj->type;
+
+    switch (t) {
+    case VM_INT:
+    case VM_CHAR:
+    case VM_BOOL:
+    case VM_FLOAT:
+        free(obj->data);
+        break;
+        
+    case VM_STR: {
+        vm_strobj *strobj = (vm_strobj*) obj->data;
+        free(strobj->data);
+        free(strobj);
+        break;
+    }
+
+    case VM_LIST: {
+        vm_listobj *list = (vm_listobj*) obj->data;
+
+        for (int i = 0; i < list->length; i++) {
+            vm_obj *elem = list->data[i];
+            vm_free_obj(elem);
+        }
+
+        free(list);
+        
+        break;
+    }
+
+    default:
+        printf("vm_free_obj not yet implemented for type %s\n", vm_show_type(t));
+    }
+
+    free(obj);
+}
+
+char *vm_show_obj(vm_obj *obj) {
+    vm_type t = obj->type;
     char *str;
     
     switch (t) {
     case VM_INT: {
-        int value = *((int*) obj.data);
+        int value = *((int*) obj->data);
         int len = snprintf(NULL, 0, "%d", value);
         str = malloc(len + 1);
         sprintf(str, "%d", value);
@@ -65,21 +125,21 @@ char *vm_show_obj(vm_obj obj) {
     }
 
     case VM_CHAR: {
-        char value = *((char*) obj.data);
+        char value = *((char*) obj->data);
         str = malloc(4);
         sprintf(str, "'%c'", value);
         return str;
     }
 
     case VM_STR: {
-        vm_strobj *strobj = (vm_strobj*) obj.data;
+        vm_strobj *strobj = (vm_strobj*) obj->data;
         str = malloc(strobj->length + 3);
         sprintf(str, "\"%.*s\"", strobj->length, strobj->data);
         return str;
     }
 
     case VM_BOOL: {
-        int value = *((int*) obj.data);
+        int value = *((int*) obj->data);
         if (value == 0) {
             str = malloc(6); // can't just return "false", because it has to be on heap
             strcpy(str, "false");
@@ -91,7 +151,7 @@ char *vm_show_obj(vm_obj obj) {
     }
 
     case VM_FLOAT: {
-        double value = *((double*) obj.data);
+        double value = *((double*) obj->data);
         int len = snprintf(NULL, 0, "%lf", value);
         str = malloc(len + 1);
         sprintf(str, "%lf", value);
@@ -99,13 +159,13 @@ char *vm_show_obj(vm_obj obj) {
     }
 
     case VM_LIST: {
-        vm_listobj *list = (vm_listobj*) obj.data;
+        vm_listobj *list = (vm_listobj*) obj->data;
         int offset = 1, alloc = 16;
         str = malloc(16);
         sprintf(str, "[");
 
         for (int i = 0; i < list->length; i++) {
-            vm_obj elem = *list->data[i];
+            vm_obj *elem = list->data[i];
             char *elem_str = vm_show_obj(elem);
             int elem_len = (int) strlen(elem_str);
             int new_alloc = alloc;
@@ -141,22 +201,21 @@ char *vm_show_obj(vm_obj obj) {
     }
 }
 
-int vm_list_append(vm_obj obj, vm_obj *elem) {
+int vm_list_append(vm_obj *obj, vm_obj *elem) {
     vm_listobj *list;
 
-    if (obj.type != VM_LIST) {
+    if (obj->type != VM_LIST) {
         return 1;
     }
 
-    list = (vm_listobj*) obj.data;
+    list = (vm_listobj*) obj->data;
     
     if (list->length >= list->capacity) {
         list->capacity += 8;
         list->data = realloc(list->data, sizeof(vm_obj*) * list->capacity);
     }
 
-    list->data[list->length] = elem;
-    list->length++;
+    list->data[list->length++] = elem;
 
     return 0;
 }

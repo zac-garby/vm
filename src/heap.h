@@ -9,7 +9,8 @@
 #define HEAP_SIZE 256
 
 typedef struct vm_heap {
-    vm_obj items[HEAP_SIZE];
+    // a HEAP_SIZE length array of objects
+    vm_obj *items;
 } vm_heap;
 
 #endif

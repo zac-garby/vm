@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "type.h"
 
@@ -31,8 +32,11 @@ void vm_new_bool(vm_obj *dest, int value);
 void vm_new_float(vm_obj *dest, double value);
 void vm_new_list(vm_obj *dest, int capacity);
 
-// frees the memory associated with a vm_obj
-void vm_free_obj(vm_obj *obj);
+// frees the memory associated with a vm_obj.
+// if free_parent_obj is false, obj will not be freed, but everything inside
+// it (including any other vm_objs) will be freed. this is necessary because
+// top level objects in the heap are not alloc'd.
+void vm_free_obj(vm_obj *obj, bool free_parent_obj);
 
 char *vm_show_obj(vm_obj *obj);
 

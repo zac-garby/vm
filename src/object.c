@@ -55,7 +55,7 @@ void vm_new_list(vm_obj *dest, int capacity) {
     dest->data = list;
 }
 
-void vm_free_obj(vm_obj *obj) {
+void vm_free_obj(vm_obj *obj, bool free_parent_obj) {
     vm_type t = obj->type;
 
     switch (t) {
@@ -78,7 +78,7 @@ void vm_free_obj(vm_obj *obj) {
 
         for (int i = 0; i < list->length; i++) {
             vm_obj *elem = list->data[i];
-            vm_free_obj(elem);
+            vm_free_obj(elem, true);
         }
 
         free(list);
@@ -90,7 +90,8 @@ void vm_free_obj(vm_obj *obj) {
         printf("vm_free_obj not yet implemented for type %s\n", vm_show_type(t));
     }
 
-    free(obj);
+    if (free_parent_obj)
+        free(obj);
 }
 
 char *vm_show_obj(vm_obj *obj) {

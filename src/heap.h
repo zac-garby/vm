@@ -6,7 +6,6 @@
 #include "object.h"
 #include "linked_list.h"
 
-// can't be any longer than 256, because it needs to be addressed in one byte
 #define VM_HEAP_SIZE 256
 
 typedef struct vm_heap {

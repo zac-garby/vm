@@ -10,10 +10,14 @@ int main() {
 
     vm_obj *my_string = malloc(sizeof(vm_obj));
     vm_new_str(my_string, "Hello, world!");
-    vm_heap_store_index(&heap, 0, my_string);
 
-    vm_obj *retr = vm_heap_retrieve_index(&heap, 0);
+    int addr = vm_heap_claim(&heap);   
+    vm_heap_store_index(&heap, addr, my_string);
+
+    vm_obj *retr = vm_heap_retrieve_index(&heap, addr);
     printf(" --> %s\n", vm_show_obj(retr));
+
+    vm_heap_release(&heap, addr);
     
     return 0;
 }

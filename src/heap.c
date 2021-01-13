@@ -5,38 +5,36 @@ vm_heap vm_new_heap() {
 
     heap.free_addresses = vm_ll_new();
 
-    for (int i = 0; i < VM_HEAP_SIZE; i++) {
-        int *addr = malloc(sizeof(int));
-        *addr = i;
-        vm_ll_append(&heap.free_addresses, addr);
+    for (vm_heap_ptr i = 0; i < VM_HEAP_SIZE; i++) {
+        vm_heap_release(&heap, i);
     }
     
     return heap;
 }
 
-void vm_heap_store_index(vm_heap *heap, int i, vm_obj *obj) {
-    memcpy(&heap->items[i], obj, sizeof(vm_obj));
+void vm_heap_store(vm_heap *heap, vm_heap_ptr p, vm_obj *obj) {
+    memcpy(&heap->items[p], obj, sizeof(vm_obj));
 }
 
-vm_obj *vm_heap_retrieve_index(vm_heap *heap, int i) {
-    if (i < 0 || i >= VM_HEAP_SIZE) return NULL;
-    return &heap->items[i];
+vm_obj *vm_heap_retrieve(vm_heap *heap, vm_heap_ptr p) {
+    if (p >= VM_HEAP_SIZE) return NULL;
+    return &heap->items[p];
 }
 
-int vm_heap_claim(vm_heap *heap) {
-    int *data = vm_ll_pop_head(&heap->free_addresses);
+vm_heap_ptr vm_heap_claim(vm_heap *heap) {
+    vm_heap_ptr *data = vm_ll_pop_head(&heap->free_addresses);
 
     if (data) {
-        int addr = *data;
+        vm_heap_ptr p = *data;
         free(data);
-        return addr;
+        return p;
     } else {
         return -1;
     }
 }
 
-void vm_heap_release(vm_heap *heap, int addr) {
-    int *data = malloc(sizeof(int));
-    *data = addr;
+void vm_heap_release(vm_heap *heap, vm_heap_ptr p) {
+    vm_heap_ptr *data = malloc(sizeof(vm_heap_ptr));
+    *data = p;
     vm_ll_append(&heap->free_addresses, data);
 }

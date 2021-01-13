@@ -8,6 +8,8 @@
 
 #define VM_HEAP_SIZE 256
 
+typedef unsigned int vm_heap_ptr;
+
 typedef struct vm_heap {
     // a HEAP_SIZE length array of objects
     vm_obj items[VM_HEAP_SIZE];
@@ -20,17 +22,17 @@ vm_heap vm_new_heap();
 
 // store an object at the given location in the heap.
 // a shallow copy is made so the original is left intact.
-void vm_heap_store_index(vm_heap *heap, int i, vm_obj *obj);
+void vm_heap_store(vm_heap *heap, vm_heap_ptr p, vm_obj *obj);
 
 // retrieve the object at the given location in the heap.
 // will return NULL if the index is out of bounds.
-vm_obj *vm_heap_retrieve_index(vm_heap *heap, int i);
+vm_obj *vm_heap_retrieve(vm_heap *heap, vm_heap_ptr p);
 
 // claims a new address in the heap, if there is space. if no
 // space is left, -1 is returned.
-int vm_heap_claim(vm_heap *heap);
+vm_heap_ptr vm_heap_claim(vm_heap *heap);
 
 // releases a previously claimed address back into the heap.
-void vm_heap_release(vm_heap *heap, int addr);
+void vm_heap_release(vm_heap *heap, vm_heap_ptr p);
 
 #endif

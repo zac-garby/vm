@@ -6,11 +6,11 @@
 #include "object.h"
 
 // can't be any longer than 256, because it needs to be addressed in one byte
-#define HEAP_SIZE 256
+#define VM_HEAP_SIZE 256
 
 typedef struct vm_heap {
     // a HEAP_SIZE length array of objects
-    vm_obj *items;
+    vm_obj items[VM_HEAP_SIZE];
 } vm_heap;
 
 vm_heap vm_new_heap();

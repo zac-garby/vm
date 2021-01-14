@@ -140,9 +140,9 @@ char *vm_debug_obj(vm_obj *obj) {
 
         for (int i = 0; i < list->length; i++) {
             vm_heap_ptr elem = list->data[i];
-            int elem_len = snprintf(NULL, 0, "#%ud", elem);
+            int elem_len = snprintf(NULL, 0, "#%u", elem);
             char *elem_str = malloc(elem_len + 1);
-            sprintf(elem_str, "#%ud", elem);
+            sprintf(elem_str, "#%u", elem);
             
             int new_alloc = alloc;
 

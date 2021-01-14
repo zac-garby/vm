@@ -8,3 +8,17 @@ The aim is to have a working VM, including:
  - Message passing between these threads
  - Garbage Collection
  - C Interfacing
+
+## Running the VM
+
+Well it doesn't do a whole lot at the moment, but compilation is easy.
+
+```
+make vm    # just compile
+
+   or
+   
+make run   # compile and run the vm
+```
+
+At the moment, it'll just run a meaningless test program.

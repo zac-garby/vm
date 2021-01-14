@@ -8,18 +8,21 @@
 int main() {
     vm_heap heap = vm_new_heap();
 
-    vm_obj *my_string = malloc(sizeof(vm_obj));
-    vm_new_str(my_string, "Hello, world!");
+    vm_heap_ptr list_p = vm_heap_claim(&heap);
+    vm_new_list(vm_heap_retrieve(&heap, list_p), 8);
 
-    vm_heap_ptr addr = vm_heap_claim(&heap);   
-    vm_heap_store(&heap, addr, my_string);
-    free(my_string);
+    vm_heap_ptr x_p = vm_heap_claim(&heap);
+    vm_heap_ptr y_p = vm_heap_claim(&heap);
+    vm_heap_ptr z_p = vm_heap_claim(&heap);
+    vm_new_str(vm_heap_retrieve(&heap, x_p), "foo");
+    vm_new_str(vm_heap_retrieve(&heap, y_p), "bar");
+    vm_new_str(vm_heap_retrieve(&heap, z_p), "baz");
 
-    vm_obj *retr = vm_heap_retrieve(&heap, addr);
-    printf(" --> %s\n", vm_debug_obj(retr));
+    vm_list_append(vm_heap_retrieve(&heap, list_p), x_p);
+    vm_list_append(vm_heap_retrieve(&heap, list_p), y_p);
+    vm_list_append(vm_heap_retrieve(&heap, list_p), z_p);
 
-    vm_free_obj(retr);
-    vm_heap_release(&heap, addr);
+    printf("%s\n", vm_debug_obj(vm_heap_retrieve(&heap, list_p)));
     
     return 0;
 }

@@ -8,8 +8,6 @@
 
 #define VM_HEAP_SIZE 256
 
-typedef unsigned int vm_heap_ptr;
-
 typedef struct vm_heap {
     // a HEAP_SIZE length array of objects
     vm_obj items[VM_HEAP_SIZE];

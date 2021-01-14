@@ -47,7 +47,7 @@ void vm_new_float(vm_obj *dest, double value) {
 
 void vm_new_list(vm_obj *dest, int capacity) {
     vm_listobj *list = malloc(sizeof(vm_listobj));
-    list->data = malloc(sizeof(vm_obj*) * capacity);
+    list->data = malloc(sizeof(vm_heap_ptr) * capacity);
     list->length = 0;
     list->capacity = capacity;
 
@@ -55,7 +55,7 @@ void vm_new_list(vm_obj *dest, int capacity) {
     dest->data = list;
 }
 
-void vm_free_obj(vm_obj *obj, bool free_parent_obj) {
+void vm_free_obj(vm_obj *obj) {
     vm_type t = obj->type;
 
     switch (t) {
@@ -75,26 +75,17 @@ void vm_free_obj(vm_obj *obj, bool free_parent_obj) {
 
     case VM_LIST: {
         vm_listobj *list = (vm_listobj*) obj->data;
-
-        for (int i = 0; i < list->length; i++) {
-            vm_obj *elem = list->data[i];
-            vm_free_obj(elem, true);
-        }
-
+        free(list->data);
         free(list);
-        
         break;
     }
 
     default:
         printf("vm_free_obj not yet implemented for type %s\n", vm_show_type(t));
     }
-
-    if (free_parent_obj)
-        free(obj);
 }
 
-char *vm_show_obj(vm_obj *obj) {
+char *vm_debug_obj(vm_obj *obj) {
     vm_type t = obj->type;
     char *str;
     
@@ -148,9 +139,11 @@ char *vm_show_obj(vm_obj *obj) {
         sprintf(str, "[");
 
         for (int i = 0; i < list->length; i++) {
-            vm_obj *elem = list->data[i];
-            char *elem_str = vm_show_obj(elem);
-            int elem_len = (int) strlen(elem_str);
+            vm_heap_ptr elem = list->data[i];
+            int elem_len = snprintf(NULL, 0, "#%ud", elem);
+            char *elem_str = malloc(elem_len + 1);
+            sprintf(elem_str, "#%ud", elem);
+            
             int new_alloc = alloc;
 
             while (offset + elem_len + 2 >= new_alloc) {
@@ -184,7 +177,7 @@ char *vm_show_obj(vm_obj *obj) {
     }
 }
 
-int vm_list_append(vm_obj *obj, vm_obj *elem) {
+int vm_list_append(vm_obj *obj, vm_heap_ptr elem) {
     vm_listobj *list;
 
     if (obj->type != VM_LIST) {
@@ -195,7 +188,7 @@ int vm_list_append(vm_obj *obj, vm_obj *elem) {
     
     if (list->length >= list->capacity) {
         list->capacity += 8;
-        list->data = realloc(list->data, sizeof(vm_obj*) * list->capacity);
+        list->data = realloc(list->data, sizeof(vm_heap_ptr) * list->capacity);
     }
 
     list->data[list->length++] = elem;

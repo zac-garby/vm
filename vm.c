@@ -16,9 +16,9 @@ int main() {
     free(my_string);
 
     vm_obj *retr = vm_heap_retrieve(&heap, addr);
-    printf(" --> %s\n", vm_show_obj(retr));
+    printf(" --> %s\n", vm_debug_obj(retr));
 
-    vm_free_obj(retr, false);
+    vm_free_obj(retr);
     vm_heap_release(&heap, addr);
     
     return 0;

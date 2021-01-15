@@ -4,25 +4,30 @@
 #include "src/type.h"
 #include "src/object.h"
 #include "src/heap.h"
+#include "src/namespace.h"
 
 int main() {
-    vm_heap heap = vm_new_heap();
+    vm_funcobj main;
+    
+    main.name = "add1";
+    main.arity = 1;
+    main.code = malloc(6);
+    main.code_length = 6;
+    main.consts = malloc(sizeof(vm_obj) * 1);
+    main.num_consts = 1;
+    main.names = malloc(sizeof(char*) * 1);
+    main.num_names = 1;
 
-    vm_heap_ptr list_p = vm_heap_claim(&heap);
-    vm_new_list(vm_heap_retrieve(&heap, list_p), 8);
+    main.code[0] = I_LOAD_CONST;
+    main.code[1] = I_LOAD_LOCAL;
+    main.code[2] = 0;
+    main.code[3] = I_ADD;
+    main.code[4] = I_RETURN;
+    main.code[5] = 1;
 
-    vm_heap_ptr x_p = vm_heap_claim(&heap);
-    vm_heap_ptr y_p = vm_heap_claim(&heap);
-    vm_heap_ptr z_p = vm_heap_claim(&heap);
-    vm_new_str(vm_heap_retrieve(&heap, x_p), "foo");
-    vm_new_str(vm_heap_retrieve(&heap, y_p), "bar");
-    vm_new_str(vm_heap_retrieve(&heap, z_p), "baz");
+    vm_new_int(&main.consts[0], 1);
 
-    vm_list_append(vm_heap_retrieve(&heap, list_p), x_p);
-    vm_list_append(vm_heap_retrieve(&heap, list_p), y_p);
-    vm_list_append(vm_heap_retrieve(&heap, list_p), z_p);
-
-    printf("%s\n", vm_debug_obj(vm_heap_retrieve(&heap, list_p)));
+    main.names[0] = "x";
     
     return 0;
 }

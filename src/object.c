@@ -55,6 +55,14 @@ void vm_new_list(vm_obj *dest, int capacity) {
     dest->data = list;
 }
 
+void vm_new_func(vm_obj *dest, vm_funcobj fn) {
+    vm_funcobj *fnobj = malloc(sizeof(vm_funcobj));
+    *fnobj = fn;
+
+    dest->type = VM_FUNC;
+    dest->data = fnobj;
+}
+
 void vm_free_obj(vm_obj *obj) {
     vm_type t = obj->type;
 
@@ -77,6 +85,12 @@ void vm_free_obj(vm_obj *obj) {
         vm_listobj *list = (vm_listobj*) obj->data;
         free(list->data);
         free(list);
+        break;
+    }
+
+    case VM_FUNC: {
+        vm_funcobj *fn = (vm_funcobj*) obj->data;
+        free(fn);
         break;
     }
 
@@ -168,6 +182,14 @@ char *vm_debug_obj(vm_obj *obj) {
 
         strcat(str, "]");
         
+        return str;
+    }
+
+    case VM_FUNC: {
+        vm_funcobj *fn = (vm_funcobj*) obj->data;
+        int len = snprintf(NULL, 0, "<function %s/%d>", fn->name, fn->arity);
+        str = malloc(len + 1);
+        sprintf(str, "<function %s/%d>", fn->name, fn->arity);
         return str;
     }
 

@@ -18,7 +18,7 @@ char *vm_show_type(vm_type t) {
         return "tuple";
     case VM_NULLABLE:
         return "nullable";
-    case VM_FUNCTION:
+    case VM_FUNC:
         return "function";
     case VM_THREAD:
         return "thread";

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #include "type.h"
+#include "bytecode.h"
 
 typedef unsigned int vm_heap_ptr;
 
@@ -27,12 +28,27 @@ typedef struct vm_listobj {
     int capacity; // the max possible length without allocating more memory
 } vm_listobj;
 
+typedef struct vm_funcobj {
+    char *name; // the name of this function
+    int arity; // the number of arguments this function takes
+
+    byte *code; // the bytecode for this function to execute
+    int code_length; // the amount of bytes in the bytecode (max 65536)
+
+    vm_obj *consts; // the constants that this function uses
+    int num_consts; // the amount of constants in this function (max 256)
+
+    char **names; // the variable names to be used in this function
+    int num_names; // the amount of variable names in this function (max 256)
+} vm_funcobj;
+
 void vm_new_int(vm_obj *dest, int value);
 void vm_new_char(vm_obj *dest, char value);
 void vm_new_str(vm_obj *dest, char *value);
 void vm_new_bool(vm_obj *dest, int value);
 void vm_new_float(vm_obj *dest, double value);
 void vm_new_list(vm_obj *dest, int capacity);
+void vm_new_func(vm_obj *dest, vm_funcobj fn);
 
 // frees the memory associated with a vm_obj
 void vm_free_obj(vm_obj *obj);

@@ -13,7 +13,7 @@ typedef enum vm_type {
     VM_LIST,
     VM_TUPLE,
     VM_NULLABLE,
-    VM_FUNCTION,
+    VM_FUNC,
     VM_THREAD,
 } vm_type;
 

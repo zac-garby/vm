@@ -5,8 +5,11 @@
 #include "src/object.h"
 #include "src/heap.h"
 #include "src/namespace.h"
+#include "src/stack.h"
+#include "src/stackframe.h"
 
 int main() {
+    vm_heap heap = vm_new_heap();
     vm_funcobj main;
     
     main.name = "add1";
@@ -28,6 +31,8 @@ int main() {
     vm_new_int(&main.consts[0], 1);
 
     main.names[0] = "x";
+
+    vm_stackframe frame = vm_new_stackframe(&main, &heap);
     
     return 0;
 }

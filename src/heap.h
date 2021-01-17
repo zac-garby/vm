@@ -6,7 +6,7 @@
 #include "object.h"
 #include "linked_list.h"
 
-#define VM_HEAP_SIZE 256
+#define VM_HEAP_SIZE 1024
 
 typedef struct vm_heap {
     // a HEAP_SIZE length array of objects

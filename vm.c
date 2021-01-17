@@ -7,6 +7,7 @@
 #include "src/namespace.h"
 #include "src/stack.h"
 #include "src/stackframe.h"
+#include "src/callstack.h"
 
 int main() {
     vm_heap heap = vm_new_heap();
@@ -32,7 +33,8 @@ int main() {
 
     main.names[0] = "x";
 
-    vm_stackframe frame = vm_new_stackframe(&main, &heap);
+    vm_callstack cs = vm_new_callstack();
+    vm_callstack_push(&cs, vm_new_stackframe(&main, &heap));
     
     return 0;
 }

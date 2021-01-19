@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "type.h"
 #include "bytecode.h"
 
 typedef unsigned int vm_heap_ptr;
+typedef uint16_t vm_thread_id;
 
 typedef struct vm_obj {
     vm_type type;

@@ -9,6 +9,7 @@ vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap) {
 
     frame.code = fn->code;
     frame.code_length = fn->code_length;
+    frame.cur = 0;
 
     frame.consts = malloc(sizeof(vm_obj) * fn->num_consts);
     memcpy(frame.consts, fn->consts, sizeof(vm_obj) * fn->num_consts);

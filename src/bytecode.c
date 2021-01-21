@@ -1,6 +1,6 @@
 #include "bytecode.h"
 
-byte VM_N_ARGS[256] = {
+uint8_t VM_N_ARGS[256] = {
     // stack instructions
     0, 0, 0, 0, NA,NA,NA,NA,NA,NA,
 

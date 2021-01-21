@@ -21,6 +21,8 @@ bool vm_callstack_pop(vm_callstack *stack) {
         return false;
     }
 
+    stack->top--;
+
     // maybe do a bit of freeing here
 
     return true;

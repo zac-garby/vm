@@ -1,6 +1,8 @@
 #ifndef H_VM_BYTECODE
 #define H_VM_BYTECODE
 
+#include <stdint.h>
+
 // the amount of args that a non-existent instruction has.
 // just a placeholder.
 #define NA 255
@@ -34,6 +36,6 @@ typedef unsigned char byte;
 #define I_LJUMP_IF 53
 #define I_RETURN 54
 
-byte VM_N_ARGS[256];
+uint8_t VM_N_ARGS[256];
 
 #endif

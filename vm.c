@@ -15,25 +15,34 @@ int main() {
     
     main.name = "add1";
     main.arity = 1;
-    main.code = malloc(6);
-    main.code_length = 6;
+    main.code = malloc(7);
+    main.code_length = 7;
     main.consts = malloc(sizeof(vm_obj) * 1);
     main.num_consts = 1;
     main.names = malloc(sizeof(char*) * 1);
     main.num_names = 1;
 
     main.code[0] = I_LOAD_CONST;
-    main.code[1] = I_LOAD_LOCAL;
-    main.code[2] = 0;
-    main.code[3] = I_ADD;
-    main.code[4] = I_RETURN;
-    main.code[5] = 1;
+    main.code[1] = 0;
+    main.code[2] = I_LOAD_LOCAL;
+    main.code[3] = 0;
+    main.code[4] = I_ADD;
+    main.code[5] = I_RETURN;
+    main.code[6] = 1;
 
     vm_new_int(&main.consts[0], 1);
 
     main.names[0] = "x";
 
     vm_thread th = vm_new_thread(0);
+    vm_callstack_push(&th.callstack, vm_new_stackframe(&main, &th.heap));
+    printf("step = %d\n", vm_thread_step(&th));
+    printf("step = %d\n", vm_thread_step(&th));
+    printf("step = %d\n", vm_thread_step(&th));
+    printf("step = %d\n", vm_thread_step(&th));
+    printf("step = %d\n", vm_thread_step(&th));
+    printf("step = %d\n", vm_thread_step(&th));
+    printf("step = %d\n", vm_thread_step(&th));
     
     return 0;
 }

@@ -41,6 +41,8 @@ int main() {
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);
     vm_stackframe_arg(&sf, &th.heap, the_arg, 0);
     vm_callstack_push(&th.callstack, sf);
+
+    printf("ptr = %d\n", sf.names.ptrs[0]);
     
     printf("step = %d\n", vm_thread_step(&th));
     printf("step = %d\n", vm_thread_step(&th));

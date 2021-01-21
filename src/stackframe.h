@@ -23,9 +23,10 @@ typedef struct vm_stackframe {
 vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap);
 
 // copies an object as the nth argument to a stackframe.
-// updates the stackframe's local namespace and allocates a copy of
-// the object on the heap.
+// the object will be copied into the heap. it's assumed that
+// the heap space for this argument has already been allocated
+// (which will be the case if vm_new_stackframe was used.)
 void vm_stackframe_arg(vm_stackframe *sf, vm_heap *heap,
-                       vm_obj *obj, int pos);
+                       vm_obj *obj, vm_name n);
 
 #endif

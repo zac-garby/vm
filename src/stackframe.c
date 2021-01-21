@@ -24,8 +24,7 @@ vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap) {
     return frame;
 }
 
-void vm_stackframe_arg(vm_stackframe *sf, vm_heap *heap, vm_obj *obj, int pos) {
-    vm_heap_ptr ptr = vm_heap_claim(heap);
+void vm_stackframe_arg(vm_stackframe *sf, vm_heap *heap, vm_obj *obj, vm_name n) {
+    vm_heap_ptr ptr = sf->names.ptrs[n];
     vm_heap_store(heap, ptr, obj);
-    sf->names.ptrs[pos] = ptr;
 }

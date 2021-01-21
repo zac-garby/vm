@@ -3,9 +3,11 @@
 
 #define VM_NAMESPACE_SIZE 256
 
+#include <stdint.h>
+
 #include "heap.h"
 
-typedef unsigned char vm_name;
+typedef uint8_t vm_name;
 
 typedef struct vm_namespace {
     vm_heap_ptr ptrs[VM_NAMESPACE_SIZE];

@@ -7,7 +7,7 @@
 // just a placeholder.
 #define NA 255
 
-typedef unsigned char byte;
+typedef uint8_t byte;
 
 // stack instructions
 #define I_NOOP 0

@@ -13,6 +13,9 @@
 int main() {
     vm_funcobj main;
     
+    vm_obj *the_arg = malloc(sizeof(vm_obj));
+    vm_new_int(the_arg, 10);
+    
     main.name = "add1";
     main.arity = 1;
     main.code = malloc(7);
@@ -35,7 +38,10 @@ int main() {
     main.names[0] = "x";
 
     vm_thread th = vm_new_thread(0);
-    vm_callstack_push(&th.callstack, vm_new_stackframe(&main, &th.heap));
+    vm_stackframe sf = vm_new_stackframe(&main, &th.heap);
+    vm_stackframe_arg(&sf, &th.heap, the_arg, 0);
+    vm_callstack_push(&th.callstack, sf);
+    
     printf("step = %d\n", vm_thread_step(&th));
     printf("step = %d\n", vm_thread_step(&th));
     printf("step = %d\n", vm_thread_step(&th));

@@ -72,6 +72,30 @@ int vm_thread_step(vm_thread *thread) {
         vm_heap_ptr ptr = frame->names.ptrs[arg];
         vm_stack_push_heap_ref(&frame->stack, ptr);
         goto ok;
+
+    case I_ADD:
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow\n");
+            goto error;
+        }
+
+        vm_stack_item right = vm_stack_pop(&frame->stack);
+        vm_stack_item left = vm_stack_pop(&frame->stack);
+
+        vm_obj *lobj = vm_stack_item_val(&left, &thread->heap);
+        vm_obj *robj = vm_stack_item_val(&right, &thread->heap);
+
+        // TODO: move the actual addition logic elsewhere
+        if (lobj->type != VM_INT || robj->type != VM_INT) {
+            printf("attempted to add non-integers\n");
+            goto error;
+        }
+
+        int sum = *((int*) lobj->data) + *((int*) robj->data);
+        vm_obj *res = malloc(sizeof(vm_obj));
+        vm_new_int(res, sum);
+        vm_stack_push_local(&frame->stack, res);
+        goto ok;
         
     default:
         printf("instruction %d not implemented\n", instr);

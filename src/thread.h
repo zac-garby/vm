@@ -21,6 +21,7 @@ vm_thread vm_new_thread(vm_thread_id id);
 // or, if there are no instructions remaining, pop the frame and return 1.
 // if there are no frames to execute, return -1.
 // if an unrecognised instruction is found, return -2.
+// if there was an error while executing the instruction, return -3.
 // if an instruction was executed successfuly, return 0.
 int vm_thread_step(vm_thread *thread);
 

@@ -29,3 +29,11 @@ void vm_stack_push_local(vm_stack *stack, vm_obj *obj) {
     item->is_heap_ref = false;
     item->data.obj = obj;
 }
+
+vm_obj *vm_stack_item_val(vm_stack_item *item, vm_heap *heap) {
+    if (item->is_heap_ref) {
+        return vm_heap_retrieve(heap, item->data.heap_ref);
+    } else {
+        return item->data.obj;
+    }
+}

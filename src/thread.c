@@ -41,8 +41,6 @@ int vm_thread_step(vm_thread *thread) {
         return -2;
     }
     
-    printf("instr = %d, nargs = %d, arg = %d\n", instr, VM_N_ARGS[instr], arg);
-
     switch (instr) {
     case I_NOOP:
         goto ok;

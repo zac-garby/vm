@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall --std=c99 -O0
+CFLAGS = -Wall -Wextra -Winline --std=c99 -O0 -pedantic
 CLIBS = -pthread
 OBJECTS = type.o object.o bytecode.o heap.o linked_list.o \
 	namespace.o stack.o stackframe.o callstack.o thread.o

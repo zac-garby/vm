@@ -13,7 +13,7 @@ typedef struct vm_stackframe {
     vm_namespace names;
     
     byte *code;
-    int code_length;
+    unsigned int code_length;
     unsigned int cur; // the current instruction
     
     vm_obj *consts;

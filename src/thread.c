@@ -45,6 +45,28 @@ int vm_thread_step(vm_thread *thread) {
     case I_NOOP:
         goto ok;
 
+    case I_DEBUG:
+        printf("\e[1;32mDEBUG\e[0;33m\n");
+        printf("in thread %d\n", thread->id);
+        printf("frame '%s' (next cur=%d, len=%d, consts=%d)\n",
+               frame->name, frame->cur, frame->code_length, frame->num_consts);
+        printf("stack (%d items)\n", frame->stack.top);
+        for (int i = 0; i < frame->stack.top; i++) {
+            vm_stack_item *item = &frame->stack.items[frame->stack.top - 1 - i];
+            vm_obj *obj = vm_stack_item_val(item, &thread->heap);
+            char *str = vm_debug_obj(obj);
+            char *si = item->is_heap_ref ? "on heap" : "on stack";
+            printf("  %d. %s (%s, %s)\n", i, str, vm_show_type(obj->type), si);
+            free(str);
+        }
+        printf("callstack (%d items)\n", thread->callstack.top);
+        for (int i = 0; i < thread->callstack.top; i++) {
+            vm_stackframe *frame = &thread->callstack.frames[thread->callstack.top-1-i];
+            printf("  %d. %s (cur=%d)\n", i, frame->name, frame->cur);
+        }
+        printf("\e[1;32mEND DEBUG\e[0m\n");
+        goto ok;
+
     case I_LOAD_CONST:
         if (arg >= frame->num_consts) {
             printf("constant %d out of bounds\n", arg);

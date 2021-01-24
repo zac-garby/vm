@@ -29,9 +29,10 @@ int main() {
     main.code[1] = 0;
     main.code[2] = I_LOAD_LOCAL;
     main.code[3] = 0;
-    main.code[4] = I_ADD;
-    main.code[5] = I_RETURN;
-    main.code[6] = 1;
+    main.code[4] = I_DEBUG;
+    main.code[5] = I_ADD;
+    main.code[6] = I_DEBUG;
+    main.code[7] = 1;
 
     vm_new_int(&main.consts[0], 1);
 

@@ -14,6 +14,7 @@ typedef uint8_t byte;
 #define I_DUP 1
 #define I_POP 2
 #define I_SWAP 3
+#define I_DEBUG 4
 
 // data instructions
 #define I_LOAD_CONST 10

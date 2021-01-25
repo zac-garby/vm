@@ -8,6 +8,7 @@
 
 #define VM_HEAP_SIZE 1024
 
+// TODO: heap should be dynamically sized
 typedef struct vm_heap {
     // a HEAP_SIZE length array of objects
     vm_obj items[VM_HEAP_SIZE];

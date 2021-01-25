@@ -18,25 +18,27 @@ int main() {
     
     main.name = "add1";
     main.arity = 1;
-    main.code = malloc(7);
-    main.code_length = 7;
+    main.code = malloc(9);
+    main.code_length = 9;
     main.consts = malloc(sizeof(vm_obj) * 1);
     main.num_consts = 1;
-    main.names = malloc(sizeof(char*) * 1);
-    main.num_names = 1;
+    main.names = malloc(sizeof(char*) * 2);
+    main.num_names = 2;
 
     main.code[0] = I_LOAD_CONST;
     main.code[1] = 0;
     main.code[2] = I_LOAD_LOCAL;
     main.code[3] = 0;
-    main.code[4] = I_DEBUG;
-    main.code[5] = I_ADD;
-    main.code[6] = I_DEBUG;
+    main.code[4] = I_ADD;
+    main.code[5] = I_DEBUG;
+    main.code[6] = I_STORE_LOCAL;
     main.code[7] = 1;
+    main.code[8] = I_DEBUG;
 
     vm_new_int(&main.consts[0], 1);
 
     main.names[0] = "x";
+    main.names[1] = "y";
 
     vm_thread th = vm_new_thread(0);
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);

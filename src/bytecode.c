@@ -2,7 +2,7 @@
 
 uint8_t VM_N_ARGS[256] = {
     // stack instructions
-    0, 0, 0, 0, 0 ,NA,NA,NA,NA,NA,
+    0, 0, 0, 0, 0, NA,NA,NA,NA,NA,
 
     // data instructions
     1, 1, 1, 1, 1, 1, NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,

@@ -45,7 +45,7 @@ int vm_thread_step(vm_thread *thread) {
     case I_NOOP:
         goto ok;
 
-    case I_DEBUG:
+    case I_DEBUG: {
         printf("\e[1;32mDEBUG\e[0;33m\n");
         printf("in thread %d\n", thread->id);
         printf("frame '%s' (next cur=%d, len=%d, consts=%d)\n",
@@ -66,8 +66,9 @@ int vm_thread_step(vm_thread *thread) {
         }
         printf("\e[1;32mEND DEBUG\e[0m\n");
         goto ok;
+    }
 
-    case I_LOAD_CONST:
+    case I_LOAD_CONST: {
         if (arg >= frame->num_consts) {
             printf("constant %d out of bounds\n", arg);
             goto error;
@@ -80,8 +81,9 @@ int vm_thread_step(vm_thread *thread) {
         
         vm_stack_push_local(&frame->stack, &frame->consts[arg]);
         goto ok;
+    }
 
-    case I_LOAD_LOCAL:
+    case I_LOAD_LOCAL: {
         // TODO: need to check that the name is valid
 
         if (vm_stack_full(&frame->stack)) {
@@ -92,8 +94,24 @@ int vm_thread_step(vm_thread *thread) {
         vm_heap_ptr ptr = frame->names.ptrs[arg];
         vm_stack_push_heap_ref(&frame->stack, ptr);
         goto ok;
+    }
 
-    case I_ADD:
+    case I_STORE_LOCAL: {
+        // TODO: need to check that the name is valid
+
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow\n");
+            goto error;
+        }
+
+        vm_heap_ptr ptr = frame->names.ptrs[arg];
+        vm_stack_item top = vm_stack_pop(&frame->stack);
+        vm_obj *obj = vm_stack_item_val(&top, &thread->heap);
+        vm_heap_store(&thread->heap, ptr, obj);
+        goto ok;
+    }
+
+    case I_ADD: {
         if (vm_stack_empty(&frame->stack)) {
             printf("data stack underflow\n");
             goto error;
@@ -116,6 +134,7 @@ int vm_thread_step(vm_thread *thread) {
         vm_new_int(res, sum);
         vm_stack_push_local(&frame->stack, res);
         goto ok;
+    }
         
     default:
         printf("instruction %d not implemented\n", instr);

@@ -84,27 +84,33 @@ int vm_thread_step(vm_thread *thread) {
     }
 
     case I_LOAD_LOCAL: {
-        // TODO: need to check that the name is valid
+        if (!vm_namespace_valid(&frame->names, arg)) {
+            printf("name out of bounds\n");
+            goto error;
+        }
 
         if (vm_stack_full(&frame->stack)) {
             printf("data stack overflow\n");
             goto error;
         }
         
-        vm_heap_ptr ptr = frame->names.ptrs[arg];
+        vm_heap_ptr ptr = vm_namespace_get_ptr(&frame->names, arg);
         vm_stack_push_heap_ref(&frame->stack, ptr);
         goto ok;
     }
 
     case I_STORE_LOCAL: {
-        // TODO: need to check that the name is valid
+        if (!vm_namespace_valid(&frame->names, arg)) {
+            printf("name out of bounds\n");
+            goto error;
+        }
 
         if (vm_stack_empty(&frame->stack)) {
             printf("data stack underflow\n");
             goto error;
         }
 
-        vm_heap_ptr ptr = frame->names.ptrs[arg];
+        vm_heap_ptr ptr = vm_namespace_get_ptr(&frame->names, arg);
         vm_stack_item top = vm_stack_pop(&frame->stack);
         vm_obj *obj = vm_stack_item_val(&top, &thread->heap);
         vm_heap_store(&thread->heap, ptr, obj);

@@ -17,8 +17,7 @@ vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap) {
 
     for (int i = 0; i < fn->num_names; i++) {
         vm_heap_ptr ptr = vm_heap_claim(heap);
-        frame.names.names[i] = fn->names[i];
-        frame.names.ptrs[i] = ptr;
+        vm_namespace_register(&frame.names, fn->names[i], ptr);
     }
     
     return frame;

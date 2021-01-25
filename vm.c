@@ -18,8 +18,8 @@ int main() {
     
     main.name = "add1";
     main.arity = 1;
-    main.code = malloc(9);
-    main.code_length = 9;
+    main.code = malloc(11);
+    main.code_length = 11;
     main.consts = malloc(sizeof(vm_obj) * 1);
     main.num_consts = 1;
     main.names = malloc(sizeof(char*) * 2);
@@ -33,7 +33,9 @@ int main() {
     main.code[5] = I_DEBUG;
     main.code[6] = I_STORE_LOCAL;
     main.code[7] = 1;
-    main.code[8] = I_DEBUG;
+    main.code[8] = I_LOAD_LOCAL;
+    main.code[9] = 1;
+    main.code[10] = I_DEBUG;
 
     vm_new_int(&main.consts[0], 1);
 

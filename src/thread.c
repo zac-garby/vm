@@ -117,6 +117,18 @@ int vm_thread_step(vm_thread *thread) {
         goto ok;
     }
 
+    case I_NEW_LIST: {
+        if (vm_stack_full(&frame->stack)) {
+            printf("data stack overflow\n");
+            goto error;
+        }
+
+        vm_obj *ls = malloc(sizeof(vm_obj));
+        vm_new_list(ls, arg);
+        vm_stack_push_local(&frame->stack, ls);
+        goto ok;
+    }
+
     case I_ADD: {
         if (vm_stack_empty(&frame->stack)) {
             printf("data stack underflow\n");

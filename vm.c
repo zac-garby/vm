@@ -19,23 +19,15 @@ int main() {
     main.name = "add1";
     main.arity = 1;
     main.code = malloc(11);
-    main.code_length = 11;
+    main.code_length = 3;
     main.consts = malloc(sizeof(vm_obj) * 1);
     main.num_consts = 1;
     main.names = malloc(sizeof(char*) * 2);
     main.num_names = 2;
 
-    main.code[0] = I_LOAD_CONST;
-    main.code[1] = 0;
-    main.code[2] = I_LOAD_LOCAL;
-    main.code[3] = 0;
-    main.code[4] = I_ADD;
-    main.code[5] = I_DEBUG;
-    main.code[6] = I_STORE_LOCAL;
-    main.code[7] = 1;
-    main.code[8] = I_LOAD_LOCAL;
-    main.code[9] = 1;
-    main.code[10] = I_DEBUG;
+    main.code[0] = I_NEW_LIST;
+    main.code[1] = 5;
+    main.code[2] = I_DEBUG;
 
     vm_new_int(&main.consts[0], 1);
 
@@ -47,15 +39,11 @@ int main() {
     vm_stackframe_arg(&sf, &th.heap, the_arg, 0);
     vm_callstack_push(&th.callstack, sf);
 
-    printf("ptr = %d\n", sf.names.ptrs[0]);
-    
-    printf("step = %d\n", vm_thread_step(&th));
-    printf("step = %d\n", vm_thread_step(&th));
-    printf("step = %d\n", vm_thread_step(&th));
-    printf("step = %d\n", vm_thread_step(&th));
-    printf("step = %d\n", vm_thread_step(&th));
-    printf("step = %d\n", vm_thread_step(&th));
-    printf("step = %d\n", vm_thread_step(&th));
+    for (;;) {
+        int status = vm_thread_step(&th);
+        printf("status = %d\n", status);
+        if (status == 1) break;
+    }
     
     return 0;
 }

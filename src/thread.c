@@ -153,6 +153,35 @@ int vm_thread_step(vm_thread *thread) {
         vm_stack_push_local(&frame->stack, res);
         goto ok;
     }
+
+    case I_LIST_APPEND: {
+        if (frame->stack.top < 2) {
+            printf("data stack underflow\n");
+            goto error;
+        }
+
+        vm_stack_item obj_item = vm_stack_pop(&frame->stack);
+        vm_stack_item ls_item = vm_stack_pop(&frame->stack);
+        
+        vm_obj *ls = vm_stack_item_val(&ls_item, &thread->heap);
+
+        if (ls->type != VM_LIST) {
+            printf("cannot append to non-lists\n");
+            goto error;
+        }
+
+        vm_heap_ptr ptr;
+        if (obj_item.is_heap_ref) {
+            ptr = obj_item.data.heap_ref;
+        } else {
+            ptr = vm_heap_claim(&thread->heap);
+            vm_heap_store(&thread->heap, ptr, obj_item.data.obj);
+        }
+
+        vm_list_append(ls, ptr);
+        vm_stack_push_local(&frame->stack, ls);
+        goto ok;
+    }
         
     default:
         printf("instruction %d not implemented\n", instr);

@@ -29,6 +29,7 @@ typedef uint8_t byte;
 #define I_SUB 31
 #define I_MUL 32
 #define I_DIV 33
+#define I_LIST_APPEND 34
 
 // control instructions
 #define I_JUMP 50

@@ -19,17 +19,24 @@ int main() {
     main.name = "add1";
     main.arity = 1;
     main.code = malloc(11);
-    main.code_length = 3;
-    main.consts = malloc(sizeof(vm_obj) * 1);
-    main.num_consts = 1;
+    main.code_length = 9;
+    main.consts = malloc(sizeof(vm_obj) * 2);
+    main.num_consts = 2;
     main.names = malloc(sizeof(char*) * 2);
     main.num_names = 2;
 
     main.code[0] = I_NEW_LIST;
     main.code[1] = 5;
-    main.code[2] = I_DEBUG;
+    main.code[2] = I_LOAD_CONST;
+    main.code[3] = 0;
+    main.code[4] = I_LIST_APPEND;
+    main.code[5] = I_LOAD_CONST;
+    main.code[6] = 1;
+    main.code[7] = I_LIST_APPEND;
+    main.code[8] = I_DEBUG;
 
     vm_new_int(&main.consts[0], 1);
+    vm_new_int(&main.consts[1], 2);
 
     main.names[0] = "x";
     main.names[1] = "y";

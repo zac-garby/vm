@@ -184,7 +184,30 @@ int vm_thread_step(vm_thread *thread) {
         goto ok;
     }
 
-    case I_CALL:
+    case I_RETURN: {
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in return)\n");
+            goto error;
+        }
+
+        vm_stack_item item = vm_stack_pop(&frame->stack);
+
+        // there won't ever be an error here, because we know there's a
+        // frame on the stack.
+        vm_callstack_pop(&thread->callstack);
+
+        vm_stackframe *next = vm_callstack_top(&thread->callstack);
+        if (!next) {
+            printf("callstack underflow (in return)\n");
+            goto error;
+        }
+
+        vm_stack_push(&next->stack, item);
+
+        goto ok;
+    }
+
+    case I_CALL: {
         if (vm_stack_empty(&frame->stack)) {
             printf("data stack underflow. no function to call\n");
             goto error;
@@ -211,9 +234,11 @@ int vm_thread_step(vm_thread *thread) {
             vm_stackframe_arg(&sf, &thread->heap, &arg_item, i);
         }
 
+        // TODO: check for an error here
         vm_callstack_push(&thread->callstack, sf);
         
         goto ok;
+    }
         
     default:
         printf("instruction %d not implemented\n", instr);

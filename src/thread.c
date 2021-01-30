@@ -234,8 +234,10 @@ int vm_thread_step(vm_thread *thread) {
             vm_stackframe_arg(&sf, &thread->heap, &arg_item, i);
         }
 
-        // TODO: check for an error here
-        vm_callstack_push(&thread->callstack, sf);
+        if (!vm_callstack_push(&thread->callstack, sf)) {
+            printf("stack overflow. too many calls!\n");
+            goto error;
+        }
         
         goto ok;
     }

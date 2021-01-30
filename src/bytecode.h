@@ -37,6 +37,7 @@ typedef uint8_t byte;
 #define I_JUMP_IF 52
 #define I_LJUMP_IF 53
 #define I_RETURN 54
+#define I_CALL 55
 
 uint8_t VM_N_ARGS[256];
 

@@ -27,6 +27,6 @@ vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap);
 // the heap space for this argument has already been allocated
 // (which will be the case if vm_new_stackframe was used.)
 void vm_stackframe_arg(vm_stackframe *sf, vm_heap *heap,
-                       vm_obj *obj, vm_name n);
+                       vm_stack_item *item, vm_name n);
 
 #endif

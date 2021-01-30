@@ -70,12 +70,12 @@ int vm_thread_step(vm_thread *thread) {
 
     case I_LOAD_CONST: {
         if (arg >= frame->num_consts) {
-            printf("constant %d out of bounds\n", arg);
+            printf("constant %d out of bounds (in load const)\n", arg);
             goto error;
         }
 
         if (vm_stack_full(&frame->stack)) {
-            printf("data stack overflow\n");
+            printf("data stack overflow (in load const)\n");
             goto error;
         }
         
@@ -85,12 +85,12 @@ int vm_thread_step(vm_thread *thread) {
 
     case I_LOAD_LOCAL: {
         if (!vm_namespace_valid(&frame->names, arg)) {
-            printf("name out of bounds\n");
+            printf("name out of bounds (in load local)\n");
             goto error;
         }
 
         if (vm_stack_full(&frame->stack)) {
-            printf("data stack overflow\n");
+            printf("data stack overflow (in load local)\n");
             goto error;
         }
         
@@ -101,12 +101,12 @@ int vm_thread_step(vm_thread *thread) {
 
     case I_STORE_LOCAL: {
         if (!vm_namespace_valid(&frame->names, arg)) {
-            printf("name out of bounds\n");
+            printf("name out of bounds (in store local)\n");
             goto error;
         }
 
         if (vm_stack_empty(&frame->stack)) {
-            printf("data stack underflow\n");
+            printf("data stack underflow (in store local)\n");
             goto error;
         }
 
@@ -119,7 +119,7 @@ int vm_thread_step(vm_thread *thread) {
 
     case I_NEW_LIST: {
         if (vm_stack_full(&frame->stack)) {
-            printf("data stack overflow\n");
+            printf("data stack overflow (in new list)\n");
             goto error;
         }
 
@@ -131,7 +131,7 @@ int vm_thread_step(vm_thread *thread) {
 
     case I_ADD: {
         if (vm_stack_empty(&frame->stack)) {
-            printf("data stack underflow\n");
+            printf("data stack underflow (in add)\n");
             goto error;
         }
 
@@ -156,7 +156,7 @@ int vm_thread_step(vm_thread *thread) {
 
     case I_LIST_APPEND: {
         if (frame->stack.top < 2) {
-            printf("data stack underflow\n");
+            printf("data stack underflow (in append)\n");
             goto error;
         }
 
@@ -179,9 +179,41 @@ int vm_thread_step(vm_thread *thread) {
         }
 
         vm_list_append(ls, ptr);
+        // TODO: shouldn't necessarily be a local?
         vm_stack_push_local(&frame->stack, ls);
         goto ok;
     }
+
+    case I_CALL:
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow. no function to call\n");
+            goto error;
+        }
+
+        vm_stack_item fn_item = vm_stack_pop(&frame->stack);
+        vm_obj *fn = vm_stack_item_val(&fn_item, &thread->heap);
+
+        if (fn->type != VM_FUNC) {
+            printf("cannot call a non-function\n");
+            goto error;
+        }
+
+        vm_funcobj *fnobj = (vm_funcobj*) fn->data;
+        vm_stackframe sf = vm_new_stackframe(fnobj, &thread->heap);
+
+        for (int i = 0; i < fnobj->arity; i++) {
+            if (vm_stack_empty(&frame->stack)) {
+                printf("data stack underflow. not enough args\n");
+                goto error;
+            }
+
+            vm_stack_item arg_item = vm_stack_pop(&frame->stack);
+            vm_stackframe_arg(&sf, &thread->heap, &arg_item, i);
+        }
+
+        vm_callstack_push(&thread->callstack, sf);
+        
+        goto ok;
         
     default:
         printf("instruction %d not implemented\n", instr);

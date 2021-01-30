@@ -15,15 +15,27 @@ vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap) {
     memcpy(frame.consts, fn->consts, sizeof(vm_obj) * fn->num_consts);
     frame.num_consts = fn->num_consts;
 
-    for (int i = 0; i < fn->num_names; i++) {
+    // for all non-parameter names, allocate some memory
+    for (int i = fn->arity; i < fn->num_names; i++) {
         vm_heap_ptr ptr = vm_heap_claim(heap);
         vm_namespace_register(&frame.names, fn->names[i], ptr);
     }
+
+    frame.names.num += fn->arity;
     
     return frame;
 }
 
-void vm_stackframe_arg(vm_stackframe *sf, vm_heap *heap, vm_obj *obj, vm_name n) {
-    vm_heap_ptr ptr = sf->names.ptrs[n];
-    vm_heap_store(heap, ptr, obj);
+void vm_stackframe_arg(vm_stackframe *sf, vm_heap *heap,
+                       vm_stack_item *item, vm_name n) {
+    vm_heap_ptr ptr;
+    
+    if (item->is_heap_ref) {
+        ptr = item->data.heap_ref;
+    } else {
+        ptr = vm_heap_claim(heap);
+        vm_heap_store(heap, ptr, item->data.obj);
+    }
+
+    sf->names.ptrs[n] = ptr;
 }

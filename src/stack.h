@@ -27,6 +27,7 @@ bool vm_stack_full(vm_stack *stack);
 vm_stack_item vm_stack_pop(vm_stack *stack);
 void vm_stack_push_heap_ref(vm_stack *stack, vm_heap_ptr ptr);
 void vm_stack_push_local(vm_stack *stack, vm_obj *obj);
+void vm_stack_push(vm_stack *stack, vm_stack_item item);
 vm_obj *vm_stack_item_val(vm_stack_item *item, vm_heap *heap);
 
 #endif

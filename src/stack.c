@@ -30,6 +30,10 @@ void vm_stack_push_local(vm_stack *stack, vm_obj *obj) {
     item->data.obj = obj;
 }
 
+void vm_stack_push(vm_stack *stack, vm_stack_item item) {
+    stack->items[stack->top++] = item;
+}
+
 vm_obj *vm_stack_item_val(vm_stack_item *item, vm_heap *heap) {
     if (item->is_heap_ref) {
         return vm_heap_retrieve(heap, item->data.heap_ref);
@@ -37,3 +41,4 @@ vm_obj *vm_stack_item_val(vm_stack_item *item, vm_heap *heap) {
         return item->data.obj;
     }
 }
+

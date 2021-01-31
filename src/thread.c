@@ -179,8 +179,7 @@ int vm_thread_step(vm_thread *thread) {
         }
 
         vm_list_append(ls, ptr);
-        // TODO: shouldn't necessarily be a local?
-        vm_stack_push_local(&frame->stack, ls);
+        vm_stack_push(&frame->stack, ls_item);
         goto ok;
     }
 

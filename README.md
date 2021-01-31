@@ -14,6 +14,10 @@ The aim is to have a working VM, including:
 Well it doesn't do a whole lot at the moment, but compilation is easy.
 
 ```
+mkdir bin
+
+   then:
+
 make vm    # just compile
 
    or

@@ -1,19 +1,20 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Winline --std=c99 -O0
 CLIBS = -pthread
-OBJECTS = type.o object.o bytecode.o heap.o linked_list.o \
-	namespace.o stack.o stackframe.o callstack.o thread.o
+OBJECTS = $(addprefix bin/,type.o object.o bytecode.o heap.o \
+	linked_list.o namespace.o stack.o stackframe.o \
+	callstack.o thread.o)
 
-%.o: src/%.c src/%.h bin
-	$(CC) -o bin/$@ -c $< $(CFLAGS)
+bin/%.o: src/%.c src/%.h
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 bin:
 	mkdir -p bin
 
-vm: vm.c bin $(OBJECTS)
-	$(CC) -o bin/vm $< $(addprefix bin/,$(OBJECTS)) $(CFLAGS) $(CLIBS)
+vm: vm.c $(OBJECTS)
+	$(CC) -o bin/vm $< $(OBJECTS) $(CFLAGS) $(CLIBS)
 
-run: clean vm
+run: vm
 	bin/vm
 
 clean:

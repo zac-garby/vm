@@ -80,13 +80,9 @@ int vm_thread_step(vm_thread *thread) {
         printf("locals (%d items)\n", frame->names.num);
         for (int i = 0; i < frame->names.num; i++) {
             vm_heap_ptr ptr = frame->names.ptrs[i];
-            printf("test\n");
             char *name = frame->names.names[i];
-            printf("test 2\n");
             vm_obj *obj = vm_heap_retrieve(&thread->heap, ptr);
-            printf("test 3. type = %d\n", obj->type);
             char *obj_str = vm_debug_obj(obj);
-            printf("test 4\n");
             printf("  %d. %s = %s (at #%d)\n", i, name, obj_str, ptr);
             free(obj_str);
         }

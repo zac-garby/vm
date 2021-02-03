@@ -18,6 +18,10 @@ vm_stack_item vm_stack_pop(vm_stack *stack) {
     return stack->items[--stack->top];
 }
 
+vm_stack_item vm_stack_peek(vm_stack *stack) {
+    return stack->items[stack->top - 1];
+}
+
 void vm_stack_push_heap_ref(vm_stack *stack, vm_heap_ptr ptr) {
     vm_stack_item *item = &stack->items[stack->top++];
     item->is_heap_ref = true;

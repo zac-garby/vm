@@ -16,12 +16,10 @@ vm_stackframe vm_new_stackframe(vm_funcobj *fn, vm_heap *heap) {
     frame.num_consts = fn->num_consts;
 
     // for all non-parameter names, allocate some memory
-    for (int i = fn->arity; i < fn->num_names; i++) {
-        vm_heap_ptr ptr = vm_heap_claim(heap);
+    for (int i = 0; i < fn->num_names; i++) {
+        vm_heap_ptr ptr = i < fn->arity ? 0 : vm_heap_claim(heap);
         vm_namespace_register(&frame.names, fn->names[i], ptr);
     }
-
-    frame.names.num += fn->arity;
     
     return frame;
 }

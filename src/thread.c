@@ -63,6 +63,15 @@ int vm_thread_step(vm_thread *thread) {
             printf("  %d. %s (%s, %s)\n", i, str, vm_show_type(obj->type), si);
             free(str);
         }
+        printf("locals (%d items)\n", frame->names.num);
+        for (int i = 0; i < frame->names.num; i++) {
+            vm_heap_ptr ptr = frame->names.ptrs[i];
+            char *name = frame->names.names[i];
+            vm_obj *obj = vm_heap_retrieve(&thread->heap, ptr);
+            char *obj_str = vm_debug_obj(obj);
+            printf("  %d. %s = %s (at #%d)\n", i, name, obj_str, ptr);
+            free(obj_str);
+        }
         printf("callstack (%d items)\n", thread->callstack.top);
         for (int i = 0; i < thread->callstack.top; i++) {
             vm_stackframe *frame = &thread->callstack.frames[thread->callstack.top-1-i];

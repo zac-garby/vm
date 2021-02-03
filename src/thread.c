@@ -45,6 +45,10 @@ int vm_thread_step(vm_thread *thread) {
     case I_NOOP:
         goto ok;
 
+    case I_POP:
+        vm_stack_pop(&frame->stack);
+        goto ok;
+
     case I_DEBUG: {
         printf("\e[1;32mDEBUG\e[0;33m\n");
         printf("in thread %d\n", thread->id);

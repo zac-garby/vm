@@ -77,14 +77,19 @@ int vm_thread_step(vm_thread *thread) {
             printf("  %d. %s (%s, %s)\n", i, str, vm_show_type(obj->type), si);
             free(str);
         }
-        printf("locals (%d items)\n", frame->names.num);
-        for (int i = 0; i < frame->names.num; i++) {
-            vm_heap_ptr ptr = frame->names.ptrs[i];
-            char *name = frame->names.names[i];
-            vm_obj *obj = vm_heap_retrieve(&thread->heap, ptr);
-            char *obj_str = vm_debug_obj(obj);
-            printf("  %d. %s = %s (at #%d)\n", i, name, obj_str, ptr);
-            free(obj_str);
+        printf("locals\n");
+        for (int i = 0; i < VM_NAMESPACE_SIZE; i++) {
+            if (vm_namespace_defined(&frame->names, i)) {
+                vm_heap_ptr ptr = vm_namespace_get_ptr(&frame->names, i);
+                char *name = vm_namespace_get_name(&frame->names, i);
+                vm_obj *obj = vm_heap_retrieve(&thread->heap, ptr);
+                char *obj_str = vm_debug_obj(obj);
+                printf("  %d. %s = %s (at #%d)\n", i, name, obj_str, ptr);
+                free(obj_str);
+            } else if (vm_namespace_declared(&frame->names, i)) {
+                char *name = vm_namespace_get_name(&frame->names, i);
+                printf("  %d. %s = <undefined>\n", i, name);
+            }
         }
         printf("callstack (%d items)\n", thread->callstack.top);
         for (int i = 0; i < thread->callstack.top; i++) {
@@ -111,8 +116,8 @@ int vm_thread_step(vm_thread *thread) {
     }
 
     case I_LOAD_LOCAL: {
-        if (!vm_namespace_valid(&frame->names, arg)) {
-            printf("name out of bounds (in load local)\n");
+        if (!vm_namespace_defined(&frame->names, arg)) {
+            printf("name %d undefined or undeclared (in load local)\n", arg);
             goto error;
         }
 
@@ -127,8 +132,8 @@ int vm_thread_step(vm_thread *thread) {
     }
 
     case I_STORE_LOCAL: {
-        if (!vm_namespace_valid(&frame->names, arg)) {
-            printf("name out of bounds (in store local)\n");
+        if (!vm_namespace_declared(&frame->names, arg)) {
+            printf("name %d does not exist (in store local)\n", arg);
             goto error;
         }
 
@@ -141,6 +146,8 @@ int vm_thread_step(vm_thread *thread) {
         vm_stack_item top = vm_stack_pop(&frame->stack);
         vm_obj *obj = vm_stack_item_val(&top, &thread->heap);
         vm_heap_store(&thread->heap, ptr, obj);
+        frame->names.defined[arg] = true;
+
         goto ok;
     }
 

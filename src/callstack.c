@@ -23,7 +23,7 @@ bool vm_callstack_pop(vm_callstack *stack) {
 
     stack->top--;
 
-    // maybe do a bit of freeing here
+    // TODO: maybe do a bit of freeing here
 
     return true;
 }

@@ -217,6 +217,16 @@ int vm_thread_step(vm_thread *thread) {
         goto ok;
     }
 
+    case I_JUMP:
+    case I_LJUMP:
+        if (arg >= frame->code_length) {
+            printf("jump %d out of bounds (in jump)\n", arg);
+            goto error;
+        }
+
+        frame->cur = arg;
+        goto ok;
+
     case I_RETURN: {
         if (vm_stack_empty(&frame->stack)) {
             printf("data stack underflow (in return)\n");

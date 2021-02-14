@@ -163,9 +163,16 @@ int vm_thread_step(vm_thread *thread) {
         goto ok;
     }
 
-    case I_ADD: {
+    case I_ADD:
+    case I_SUB:
+    case I_MUL:
+    case I_DIV:
+    case I_LT:
+    case I_GT:
+    case I_LTE:
+    case I_GTE: {
         if (vm_stack_empty(&frame->stack)) {
-            printf("data stack underflow (in add)\n");
+            printf("data stack underflow (in numeric binop %d)\n", instr);
             goto error;
         }
 
@@ -175,19 +182,44 @@ int vm_thread_step(vm_thread *thread) {
         vm_obj *lobj = vm_stack_item_val(&left, &thread->heap);
         vm_obj *robj = vm_stack_item_val(&right, &thread->heap);
 
-        // TODO: move the actual addition logic elsewhere
-        if (lobj->type != VM_INT || robj->type != VM_INT) {
-            printf("attempted to add non-integers\n");
+        if (lobj->type == VM_INT && robj->type == VM_INT) {
+            binop_int(instr, *((int*) lobj->data), *((int*) robj->data),
+                      &frame->stack);
+            goto ok;
+        } else if (lobj->type == VM_FLOAT && robj->type == VM_FLOAT) {
+            binop_int(instr, *((double*) lobj->data), *((double*) robj->data),
+                      &frame->stack);
+            goto ok;
+        } else {
+            printf("invalid binary operation between %s and %s\n",
+                   vm_show_type(lobj->type), vm_show_type(robj->type));
+            goto error;
+        }
+    }
+
+    case I_EQ: {
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in eq)\n");
             goto error;
         }
 
-        int sum = *((int*) lobj->data) + *((int*) robj->data);
-        vm_obj *res = malloc(sizeof(vm_obj));
-        vm_new_int(res, sum);
-        vm_stack_push_local(&frame->stack, res);
-        goto ok;
-    }
+        vm_stack_item right = vm_stack_pop(&frame->stack);
 
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in eq)\n");
+            goto error;
+        }
+
+        vm_stack_item left = vm_stack_pop(&frame->stack);
+
+        vm_obj *lobj = vm_stack_item_val(&left, &thread->heap);
+        vm_obj *robj = vm_stack_item_val(&right, &thread->heap);
+
+        vm_obj *ret = malloc(sizeof(vm_obj));
+        vm_new_bool(ret, vm_obj_equal(lobj, robj, &thread->heap));
+        vm_stack_push_local(&frame->stack, ret);
+    }
+        
     case I_LIST_APPEND: {
         if (frame->stack.top < 2) {
             printf("data stack underflow (in append)\n");
@@ -295,4 +327,92 @@ int vm_thread_step(vm_thread *thread) {
     
     ok:
     return 0;
+}
+
+void binop_int(byte instr, int l, int r, vm_stack *stack) {
+    int result;
+    int cmp = -1;
+
+    switch (instr) {
+    case I_ADD: result = l + r; break;
+    case I_SUB: result = l - r; break;
+    case I_MUL: result = l * r; break;
+    case I_DIV: result = l / r; break;
+    case I_LT: cmp = l < r; break;
+    case I_GT: cmp = l > r; break;
+    case I_LTE: cmp = l <= r; break;
+    case I_GTE: cmp = l >= r; break;
+    // one of these cases will always match
+    }
+    
+    vm_obj *res = malloc(sizeof(vm_obj));
+    if (cmp >= 0) {
+        vm_new_bool(res, cmp);
+    } else {
+        vm_new_int(res, result);
+    }
+    vm_stack_push_local(stack, res);
+}
+
+void binop_float(byte instr, double l, double r, vm_stack *stack) {
+    double result;
+    int cmp = -1;
+
+    switch (instr) {
+    case I_ADD: result = l + r; break;
+    case I_SUB: result = l - r; break;
+    case I_MUL: result = l * r; break;
+    case I_DIV: result = l / r; break;
+    case I_LT: cmp = l < r; break;
+    case I_GT: cmp = l > r; break;
+    case I_LTE: cmp = l <= r; break;
+    case I_GTE: cmp = l >= r; break;
+    // one of these cases will always match
+    }
+    
+    vm_obj *res = malloc(sizeof(vm_obj));
+    if (cmp >= 0) {
+        vm_new_bool(res, cmp);
+    } else {
+        vm_new_float(res, result);
+    }
+    vm_stack_push_local(stack, res);
+}
+
+bool vm_obj_equal(vm_obj *a, vm_obj *b, vm_heap *heap) {
+    if (a->type != b->type) return false;
+
+    void *ad = a->data, *bd = b->data;
+
+    switch (a->type) {
+    case VM_INT:
+        return *((int*) ad) == *((int*) bd);
+    case VM_CHAR:
+        return *((char*) ad) == *((char*) bd);
+    case VM_STR: {
+        vm_strobj *as = ad, *bs = bd;
+        if (as->length != bs->length) return false;
+        return (strncmp(as->data, bs->data, as->length)) == 0;
+    }
+    case VM_BOOL:
+        return *((char*) ad) == *((char*) bd);
+    case VM_FLOAT:
+        return *((char*) ad) == *((char*) bd);
+    case VM_LIST: {
+        vm_listobj *al = ad, *bl = bd;
+        if (al->length != bl->length) return false;
+        for (int i = 0; i < al->length; i++) {
+            vm_obj *x, *y;
+            x = vm_heap_retrieve(heap, al->data[i]);
+            y = vm_heap_retrieve(heap, bl->data[i]);
+            if (!vm_obj_equal(x, y, heap)) return false;
+        }
+        return true;
+    }
+    case VM_TUPLE:
+    case VM_NULLABLE:
+    case VM_FUNC:
+    case VM_THREAD:
+        return false;
+    }
 }

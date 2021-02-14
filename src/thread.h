@@ -25,4 +25,8 @@ vm_thread vm_new_thread(vm_thread_id id);
 // if an instruction was executed successfuly, return 0.
 int vm_thread_step(vm_thread *thread);
 
+void binop_int(byte instr, int l, int r, vm_stack *stack);
+void binop_float(byte instr, double l, double r, vm_stack *stack);
+bool vm_obj_equal(vm_obj *a, vm_obj *b, vm_heap *heap);
+
 #endif

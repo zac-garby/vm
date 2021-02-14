@@ -29,10 +29,10 @@ int main() {
 
     main.code[0] = I_LOAD_CONST;
     main.code[1] = 0;
-    main.code[2] = I_DEBUG;
-    main.code[3] = I_LJUMP;
-    main.code[4] = 2;
-    main.code[5] = 0;
+    main.code[2] = I_LOAD_CONST;
+    main.code[3] = 1;
+    main.code[4] = I_EQ;
+    main.code[5] = I_DEBUG;
     main.code[6] = I_LOAD_CONST;
     main.code[7] = 1;
     main.code[8] = I_CALL;
@@ -63,7 +63,7 @@ int main() {
 
     vm_new_int(&inc.consts[0], 1);
     vm_new_int(&main.consts[0], 5);
-    vm_new_func(&main.consts[1], inc);
+    vm_new_int(&main.consts[1], 5);
 
     vm_thread th = vm_new_thread(0);
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);

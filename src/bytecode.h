@@ -40,8 +40,8 @@ typedef uint8_t byte;
 // control instructions
 #define I_JUMP 50
 #define I_LJUMP 51
-#define I_JUMP_IF 52
-#define I_LJUMP_IF 53
+#define I_JUMP_FALSE 52
+#define I_LJUMP_FALSE 53
 #define I_RETURN 54
 #define I_CALL 55
 

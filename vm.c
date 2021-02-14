@@ -18,10 +18,10 @@ int main() {
     
     main.name = "main";
     main.arity = 0;
-    main.code = malloc(13);
-    main.code_length = 6;
-    main.consts = malloc(sizeof(vm_obj) * 2);
-    main.num_consts = 2;
+    main.code = malloc(22);
+    main.code_length = 22;
+    main.consts = malloc(sizeof(vm_obj) * 3);
+    main.num_consts = 3;
     main.names = malloc(sizeof(char*) * 2);
     main.num_names = 2;
     main.names[0] = "x";
@@ -29,17 +29,26 @@ int main() {
 
     main.code[0] = I_LOAD_CONST;
     main.code[1] = 0;
-    main.code[2] = I_LOAD_CONST;
-    main.code[3] = 1;
-    main.code[4] = I_EQ;
-    main.code[5] = I_DEBUG;
+    main.code[2] = I_STORE_LOCAL;
+    main.code[3] = 0;
+    main.code[4] = I_LOAD_LOCAL;
+    main.code[5] = 0;
     main.code[6] = I_LOAD_CONST;
     main.code[7] = 1;
-    main.code[8] = I_CALL;
-    main.code[9] = I_LOAD_LOCAL;
-    main.code[10] = 0;
-    main.code[11] = I_POP;
-    main.code[12] = I_DEBUG;
+    main.code[8] = I_LT;
+    main.code[9] = I_JUMP_FALSE;
+    main.code[10] = 21;
+    main.code[11] = I_DEBUG;
+    main.code[12] = I_LOAD_LOCAL;
+    main.code[13] = 0;
+    main.code[14] = I_LOAD_CONST;
+    main.code[15] = 2;
+    main.code[16] = I_ADD;
+    main.code[17] = I_STORE_LOCAL;
+    main.code[18] = 0;
+    main.code[19] = I_JUMP;
+    main.code[20] = 4;
+    main.code[21] = I_DEBUG;
 
     inc.name = "inc";
     inc.arity = 1;
@@ -62,8 +71,10 @@ int main() {
     inc.code[8] = I_RETURN;
 
     vm_new_int(&inc.consts[0], 1);
-    vm_new_int(&main.consts[0], 5);
+    
+    vm_new_int(&main.consts[0], 0);
     vm_new_int(&main.consts[1], 5);
+    vm_new_int(&main.consts[2], 1);
 
     vm_thread th = vm_new_thread(0);
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);

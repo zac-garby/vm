@@ -259,6 +259,34 @@ int vm_thread_step(vm_thread *thread) {
         frame->cur = arg;
         goto ok;
 
+    case I_JUMP_FALSE:
+    case I_LJUMP_FALSE: {
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in jump-false)\n");
+            goto error;
+        }
+
+        vm_stack_item item = vm_stack_pop(&frame->stack);
+        vm_obj *obj = vm_stack_item_val(&item, &thread->heap);
+
+        if (obj->type != VM_BOOL) {
+            printf("conditions must be booleans, got %s\n",
+                   vm_show_type(obj->type));
+            goto error;
+        }
+
+        if (!*((bool*) obj->data)) {
+            if (arg >= frame->code_length) {
+                printf("jump %d out of bounds (in jump-false)\n", arg);
+                goto error;
+            }
+
+            frame->cur = arg;
+        }
+
+        goto ok;
+    }
+
     case I_RETURN: {
         if (vm_stack_empty(&frame->stack)) {
             printf("data stack underflow (in return)\n");

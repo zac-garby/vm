@@ -63,6 +63,16 @@ int vm_thread_step(vm_thread *thread) {
         vm_stack_pop(&frame->stack);
         goto ok;
 
+    case I_SWAP: {
+        vm_stack_item a = vm_stack_pop(&frame->stack);
+        vm_stack_item b = vm_stack_pop(&frame->stack);
+
+        vm_stack_push(&frame->stack, a);
+        vm_stack_push(&frame->stack, b);
+        
+        goto ok;
+    }
+
     case I_DEBUG: {
         printf("\e[1;32mDEBUG\e[0;33m\n");
         printf("in thread %d\n", thread->id);

@@ -19,7 +19,7 @@ int main() {
     main.name = "main";
     main.arity = 0;
     main.code = malloc(22);
-    main.code_length = 22;
+    main.code_length = 7;
     main.consts = malloc(sizeof(vm_obj) * 3);
     main.num_consts = 3;
     main.names = malloc(sizeof(char*) * 2);
@@ -29,11 +29,11 @@ int main() {
 
     main.code[0] = I_LOAD_CONST;
     main.code[1] = 0;
-    main.code[2] = I_STORE_LOCAL;
-    main.code[3] = 0;
-    main.code[4] = I_LOAD_LOCAL;
-    main.code[5] = 0;
-    main.code[6] = I_LOAD_CONST;
+    main.code[2] = I_LOAD_CONST;
+    main.code[3] = 1;
+    main.code[4] = I_DEBUG;
+    main.code[5] = I_SWAP;
+    main.code[6] = I_DEBUG;
     main.code[7] = 1;
     main.code[8] = I_LT;
     main.code[9] = I_JUMP_FALSE;

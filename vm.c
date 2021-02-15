@@ -19,7 +19,7 @@ int main() {
     main.name = "main";
     main.arity = 0;
     main.code = malloc(22);
-    main.code_length = 7;
+    main.code_length = 6;
     main.consts = malloc(sizeof(vm_obj) * 3);
     main.num_consts = 3;
     main.names = malloc(sizeof(char*) * 2);
@@ -31,8 +31,8 @@ int main() {
     main.code[1] = 0;
     main.code[2] = I_LOAD_CONST;
     main.code[3] = 1;
-    main.code[4] = I_DEBUG;
-    main.code[5] = I_SWAP;
+    main.code[4] = I_EQ;
+    main.code[5] = I_DEBUG;
     main.code[6] = I_DEBUG;
     main.code[7] = 1;
     main.code[8] = I_LT;
@@ -72,9 +72,9 @@ int main() {
 
     vm_new_int(&inc.consts[0], 1);
     
-    vm_new_int(&main.consts[0], 0);
+    vm_new_int(&main.consts[0], 5);
     vm_new_int(&main.consts[1], 5);
-    vm_new_int(&main.consts[2], 1);
+    vm_new_int(&main.consts[2], 10);
 
     vm_thread th = vm_new_thread(0);
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);

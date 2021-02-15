@@ -228,6 +228,31 @@ int vm_thread_step(vm_thread *thread) {
         vm_obj *ret = malloc(sizeof(vm_obj));
         vm_new_bool(ret, vm_obj_equal(lobj, robj, &thread->heap));
         vm_stack_push_local(&frame->stack, ret);
+        goto ok;
+    }
+
+    case I_NEQ: {
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in neq)\n");
+            goto error;
+        }
+
+        vm_stack_item right = vm_stack_pop(&frame->stack);
+
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in neq)\n");
+            goto error;
+        }
+
+        vm_stack_item left = vm_stack_pop(&frame->stack);
+
+        vm_obj *lobj = vm_stack_item_val(&left, &thread->heap);
+        vm_obj *robj = vm_stack_item_val(&right, &thread->heap);
+
+        vm_obj *ret = malloc(sizeof(vm_obj));
+        vm_new_bool(ret, !vm_obj_equal(lobj, robj, &thread->heap));
+        vm_stack_push_local(&frame->stack, ret);
+        goto ok;
     }
         
     case I_LIST_APPEND: {

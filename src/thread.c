@@ -161,6 +161,42 @@ int vm_thread_step(vm_thread *thread) {
         goto ok;
     }
 
+    case I_LOAD_GLOBAL: {
+        if (!vm_namespace_defined(&thread->globals, arg)) {
+            printf("name %d is undefined or undeclared (in load global)\n", arg);
+            goto error;
+        }
+
+        if (vm_stack_full(&frame->stack)) {
+            printf("data stack overflow (in load global)\n");
+            goto error;
+        }
+
+        vm_heap_ptr ptr = vm_namespace_get_ptr(&thread->globals, arg);
+        vm_stack_push_heap_ref(&frame->stack, ptr);
+        goto ok;
+    }
+
+    case I_STORE_GLOBAL: {
+        if (!vm_namespace_declared(&thread->globals, arg)) {
+            printf("name %d does not exist (in store global)\n", arg);
+            goto error;
+        }
+
+        if (vm_stack_empty(&frame->stack)) {
+            printf("data stack underflow (in store global)\n");
+            goto error;
+        }
+
+        vm_heap_ptr ptr = vm_namespace_get_ptr(&thread->globals, arg);
+        vm_stack_item top = vm_stack_pop(&frame->stack);
+        vm_obj *obj = vm_stack_item_val(&top, &thread->heap);
+        vm_heap_store(&thread->heap, ptr, obj);
+        thread->globals.defined[arg] = true;
+
+        goto ok;
+    }
+
     case I_NEW_LIST: {
         if (vm_stack_full(&frame->stack)) {
             printf("data stack overflow (in new list)\n");

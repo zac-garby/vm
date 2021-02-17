@@ -19,7 +19,7 @@ int main() {
     main.name = "main";
     main.arity = 0;
     main.code = malloc(22);
-    main.code_length = 6;
+    main.code_length = 7;
     main.consts = malloc(sizeof(vm_obj) * 3);
     main.num_consts = 3;
     main.names = malloc(sizeof(char*) * 2);
@@ -29,10 +29,10 @@ int main() {
 
     main.code[0] = I_LOAD_CONST;
     main.code[1] = 0;
-    main.code[2] = I_LOAD_CONST;
-    main.code[3] = 1;
-    main.code[4] = I_EQ;
-    main.code[5] = I_DEBUG;
+    main.code[2] = I_STORE_GLOBAL;
+    main.code[3] = 0;
+    main.code[4] = I_LOAD_GLOBAL;
+    main.code[5] = 0;
     main.code[6] = I_DEBUG;
     main.code[7] = 1;
     main.code[8] = I_LT;
@@ -77,6 +77,7 @@ int main() {
     vm_new_int(&main.consts[2], 10);
 
     vm_thread th = vm_new_thread(0);
+    vm_namespace_declare(&th.globals, 0, "foo", vm_heap_claim(&th.heap));
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);
     vm_callstack_push(&th.callstack, sf);
 

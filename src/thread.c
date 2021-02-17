@@ -101,6 +101,20 @@ int vm_thread_step(vm_thread *thread) {
                 printf("  %d. %s = <undefined>\n", i, name);
             }
         }
+        printf("globals\n");
+        for (int i = 0; i < VM_NAMESPACE_SIZE; i++) {
+            if (vm_namespace_defined(&thread->globals, i)) {
+                vm_heap_ptr ptr = vm_namespace_get_ptr(&thread->globals, i);
+                char *name = vm_namespace_get_name(&thread->globals, i);
+                vm_obj *obj = vm_heap_retrieve(&thread->heap, ptr);
+                char *obj_str = vm_debug_obj(obj);
+                printf("  %d. %s = %s (at #%d)\n", i, name, obj_str, ptr);
+                free(obj_str);
+            } else if (vm_namespace_declared(&thread->globals, i)) {
+                char *name = vm_namespace_get_name(&thread->globals, i);
+                printf("  %d. %s = <undefined>\n", i, name);
+            }
+        }
         printf("callstack (%d items)\n", thread->callstack.top);
         for (int i = 0; i < thread->callstack.top; i++) {
             vm_stackframe *frame = &thread->callstack.frames[thread->callstack.top-1-i];

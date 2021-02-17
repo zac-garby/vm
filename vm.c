@@ -78,6 +78,7 @@ int main() {
 
     vm_thread th = vm_new_thread(0);
     vm_namespace_declare(&th.globals, 0, "foo", vm_heap_claim(&th.heap));
+    vm_namespace_declare(&th.globals, 1, "bar", vm_heap_claim(&th.heap));
     vm_stackframe sf = vm_new_stackframe(&main, &th.heap);
     vm_callstack_push(&th.callstack, sf);
 

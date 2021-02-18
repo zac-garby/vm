@@ -11,7 +11,11 @@
 #include "src/callstack.h"
 #include "src/thread.h"
 
-void print_code(vm_stackframe *frame);
+#define MAX(a, b) (a)>(b)?(a):(b);
+
+void print_debugger(vm_thread *thread);
+void print_code_line(int line, vm_stackframe *frame);
+void print_stack_line(int line, vm_thread *thread);
 
 int main() {
     vm_funcobj main, inc;
@@ -87,8 +91,8 @@ int main() {
 
     printf("\e[2J\e[;H");
     do {
-        printf("\n");
-        print_code(vm_callstack_top(&th.callstack));
+        printf("\n \e[2;31m------- ^ stdout ^ -------- \e[0m\n\n");
+        print_debugger(&th);
         getchar();
         printf("\e[2J\e[;H");
     } while (vm_thread_step(&th) != 1);
@@ -96,35 +100,73 @@ int main() {
     return 0;
 }
 
-void print_code(vm_stackframe *frame) {
-    for (unsigned int i = 0; i < frame->code_length; i++) {        
-        byte instr = frame->code[i];
-        int n_args = VM_N_ARGS[instr];
-        bool has_arg = n_args != 0 && n_args != NA;
-        uint16_t arg = 0;
-        char *instr_s = vm_show_bytecode(instr);
-        
-        if (has_arg) {
-            for (int j = 0; j < n_args; j++) {
-                i++;
-                arg |= ((uint16_t) frame->code[i]) << (8 * j);
-            }
-        }
+void print_debugger(vm_thread *thread) {
+    vm_stackframe *frame = vm_callstack_top(&thread->callstack);
+    unsigned int n_instrs = num_instructions(frame->code, frame->code_length);
+    unsigned int top_lines = MAX(n_instrs, (unsigned int) frame->stack.top);
 
-        if (frame->cur == i - n_args) {
-            printf("\e[1;33m>>");
-        } else {
-            printf("\e[0;33m  ");
-        }
-
-        if (has_arg) {
-            printf(" % 4d\t%-16s (%d)\t\n",
-               i - n_args, instr_s, arg);
-        } else {
-            printf(" % 4d\t%-16s \t\n",
-               i, instr_s);
-        }
+    printf("\e[4;33mCODE                            │ STACK                \e[0m\n");
+    for (unsigned int i = 0; i < top_lines; i++) {
+        print_code_line(i, frame);
+        print_stack_line(i, thread);
+        printf("\n");
     }
 
     printf("\e[0m");
+}
+
+void print_code_line(int line, vm_stackframe *frame) {
+    unsigned int i = 0;
+    for (int j = 0; j < line; j++) {
+        byte instr = frame->code[i];
+        i += 1 + VM_N_ARGS[instr];
+    }
+
+    if (i >= frame->code_length) {
+        printf("\e[0;33m     \t                      \t│");
+        return;
+    }
+    
+    byte instr = frame->code[i];
+    int n_args = VM_N_ARGS[instr];
+    bool has_arg = n_args != 0 && n_args != NA;
+    uint16_t arg = 0;
+    char *instr_s = vm_show_bytecode(instr);
+    
+    if (has_arg) {
+        for (int j = 0; j < n_args; j++) {
+            i++;
+            arg |= ((uint16_t) frame->code[i]) << (8 * j);
+        }
+    }
+    
+    if (frame->cur == i - n_args) {
+        printf("\e[1;33m>>");
+    } else {
+        printf("\e[0;33m  ");
+    }
+    
+    if (has_arg) {
+        printf(" % 4d\t%-16s (%-3d)\t│",
+               i - n_args, instr_s, arg);
+    } else {
+        printf(" % 4d\t%-16s \t│",
+               i, instr_s);
+    }
+}
+
+void print_stack_line(int line, vm_thread *thread) {
+    vm_stackframe *frame = vm_callstack_top(&thread->callstack);
+    if (line >= frame->stack.top) {
+        printf("  \e[2;36m---\e[0m");
+        return;
+    }
+    
+    vm_stack_item *item = &frame->stack.items[line];
+    vm_obj *obj = vm_stack_item_val(item, &thread->heap);
+    char *str = vm_debug_obj(obj);
+    char *si = item->is_heap_ref ? "on heap" : "on stack";
+    printf("  \e[2;36m%d. \e[0m\e[1;96m%s \e[0;36m(%s, %s)",
+           line, str, vm_show_type(obj->type), si);
+    free(str);
 }

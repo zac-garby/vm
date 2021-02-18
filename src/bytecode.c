@@ -47,3 +47,14 @@ char *vm_show_bytecode(byte instr) {
     default: return "<uh oh>";
     }
 }
+
+unsigned int num_instructions(byte *code, int n_bytes) {
+    unsigned int n = 0;
+    
+    for (unsigned int i = 0; i < (unsigned int) n_bytes; n++) {
+        byte instr = code[i];
+        i += 1 + VM_N_ARGS[instr];
+    }
+
+    return n;
+}

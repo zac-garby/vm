@@ -47,5 +47,6 @@ typedef uint8_t byte;
 
 uint8_t VM_N_ARGS[256];
 char *vm_show_bytecode(byte instr);
+unsigned int num_instructions(byte *code, int n_bytes);
 
 #endif

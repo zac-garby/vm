@@ -46,5 +46,6 @@ typedef uint8_t byte;
 #define I_CALL 55
 
 uint8_t VM_N_ARGS[256];
+char *vm_show_bytecode(byte instr);
 
 #endif

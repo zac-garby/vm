@@ -105,12 +105,14 @@ void print_debugger(vm_thread *thread) {
     unsigned int n_instrs = num_instructions(frame->code, frame->code_length);
     unsigned int top_lines = MAX(n_instrs, (unsigned int) frame->stack.top);
 
-    printf("\e[4;33mCODE                            │ STACK                \e[0m\n");
+    printf("\e[2;33min stackframe \"\e[0;32m%s\e[2;33m\"\n", frame->name);
+    printf("\e[1;4;33mCODE                            │ STACK                \e[0m\n");
     for (unsigned int i = 0; i < top_lines; i++) {
         print_code_line(i, frame);
         print_stack_line(i, thread);
         printf("\n");
     }
+    printf("\e[4;33m                                │                      \e[0m\n");
 
     printf("\e[0m");
 }

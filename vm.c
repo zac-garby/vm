@@ -126,6 +126,7 @@ void print_debugger(vm_thread *thread) {
         print_namespace_line(i, &thread->globals, thread);
         printf("\n");
     }
+    printf("\e[4;33m                                │                               \e[0m\n");
     
     printf("\e[0m");
 }

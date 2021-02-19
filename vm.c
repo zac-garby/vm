@@ -16,6 +16,7 @@
 void print_debugger(vm_thread *thread);
 void print_code_line(int line, vm_stackframe *frame);
 void print_stack_line(int line, vm_thread *thread);
+void print_namespace_line(int line, vm_namespace *ns, vm_thread *thread);
 
 int main() {
     vm_funcobj main, inc;
@@ -26,13 +27,12 @@ int main() {
     main.name = "main";
     main.arity = 0;
     main.code = malloc(22);
-    main.code_length = 7;
+    main.code_length = 8;
     main.consts = malloc(sizeof(vm_obj) * 3);
     main.num_consts = 3;
     main.names = malloc(sizeof(char*) * 2);
-    main.num_names = 2;
+    main.num_names = 1;
     main.names[0] = "x";
-    main.names[1] = "y";
 
     main.code[0] = I_LOAD_CONST;
     main.code[1] = 0;
@@ -40,8 +40,8 @@ int main() {
     main.code[3] = 0;
     main.code[4] = I_LOAD_GLOBAL;
     main.code[5] = 0;
-    main.code[6] = I_DEBUG;
-    main.code[7] = 1;
+    main.code[6] = I_STORE_LOCAL;
+    main.code[7] = 0;
     main.code[8] = I_LT;
     main.code[9] = I_JUMP_FALSE;
     main.code[10] = 21;
@@ -104,17 +104,54 @@ void print_debugger(vm_thread *thread) {
     vm_stackframe *frame = vm_callstack_top(&thread->callstack);
     unsigned int n_instrs = num_instructions(frame->code, frame->code_length);
     unsigned int top_lines = MAX(n_instrs, (unsigned int) frame->stack.top);
+    int num_locals = vm_count_declared(&frame->names);
+    int num_globals = vm_count_declared(&thread->globals);
+    int bottom_lines = MAX(num_locals, num_globals);
 
-    printf("\e[2;33min stackframe \"\e[0;32m%s\e[2;33m\"\n", frame->name);
-    printf("\e[1;4;33mCODE                            │ STACK                \e[0m\n");
+    printf("\e[0;33min stackframe \"\e[1;32m%s\e[0;33m\"\n", frame->name);
+
+    printf("\e[0m\e[4;33m                                                                \e[0m\n");
+    printf("\e[1;7;33m CODE                           │ STACK                          \e[0m\n");
     for (unsigned int i = 0; i < top_lines; i++) {
         print_code_line(i, frame);
         print_stack_line(i, thread);
         printf("\n");
     }
-    printf("\e[4;33m                                │                      \e[0m\n");
+    printf("\e[4;33m                                │                               \e[0m\n");
 
+    printf("\e[1;7;33m LOCALS                         │ GLOBALS                        \e[0m\n");
+    for (int i = 0; i < bottom_lines; i++) {
+        print_namespace_line(i, &frame->names, thread);
+        printf("│");
+        print_namespace_line(i, &thread->globals, thread);
+        printf("\n");
+    }
+    
     printf("\e[0m");
+}
+
+void print_namespace_line(int line, vm_namespace *ns, vm_thread *thread) {
+    int i = 0;
+    for (int j = 0; j < line; j++) {
+        for (i++; !vm_namespace_declared(ns, i); i++);
+    }
+
+    if (i >= 256) {
+        printf("\e[0;33m                                ");
+        return;
+    }
+
+    if (vm_namespace_defined(ns, i)) {
+        vm_heap_ptr ptr = vm_namespace_get_ptr(ns, i);
+        char *name = vm_namespace_get_name(ns, i);
+        vm_obj *obj = vm_heap_retrieve(&thread->heap, ptr);
+        char *obj_str = vm_debug_obj(obj);
+        printf("\e[0;33m %10s \e[2m= \e[0;33m%-10s (\e[2m#%3d\e[0;33m) ", name, obj_str, ptr);
+        free(obj_str);
+    } else {
+        char *name = vm_namespace_get_name(ns, i);
+        printf("\e[0;33m %10s \e[2m= undefined         \e[0;33m", name);
+    }
 }
 
 void print_code_line(int line, vm_stackframe *frame) {

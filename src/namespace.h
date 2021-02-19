@@ -23,5 +23,6 @@ bool vm_namespace_declared(vm_namespace *ns, vm_name n);
 bool vm_namespace_defined(vm_namespace *ns, vm_name n);
 char *vm_namespace_get_name(vm_namespace *ns, vm_name n);
 vm_heap_ptr vm_namespace_get_ptr(vm_namespace *ns, vm_name n);
+int vm_count_declared(vm_namespace *ns);
 
 #endif

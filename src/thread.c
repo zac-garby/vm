@@ -87,7 +87,7 @@ int vm_thread_step(vm_thread *thread) {
             printf("  %d. %s (%s, %s)\n", i, str, vm_show_type(obj->type), si);
             free(str);
         }
-        printf("locals\n");
+        printf("locals (%d)\n", vm_count_declared(&frame->names));
         for (int i = 0; i < VM_NAMESPACE_SIZE; i++) {
             if (vm_namespace_defined(&frame->names, i)) {
                 vm_heap_ptr ptr = vm_namespace_get_ptr(&frame->names, i);
@@ -101,7 +101,7 @@ int vm_thread_step(vm_thread *thread) {
                 printf("  %d. %s = <undefined>\n", i, name);
             }
         }
-        printf("globals\n");
+        printf("globals (%d)\n", vm_count_declared(&thread->globals));
         for (int i = 0; i < VM_NAMESPACE_SIZE; i++) {
             if (vm_namespace_defined(&thread->globals, i)) {
                 vm_heap_ptr ptr = vm_namespace_get_ptr(&thread->globals, i);

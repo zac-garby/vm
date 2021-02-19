@@ -36,3 +36,15 @@ char *vm_namespace_get_name(vm_namespace *ns, vm_name n) {
 vm_heap_ptr vm_namespace_get_ptr(vm_namespace *ns, vm_name n) {
     return ns->ptrs[n];
 }
+
+int vm_count_declared(vm_namespace *ns) {
+    int count = 0;
+
+    for (int i = 0; i < VM_NAMESPACE_SIZE; i++) {
+        if (vm_namespace_declared(ns, i)) {
+            count++;
+        }
+    }
+    
+    return count;
+}

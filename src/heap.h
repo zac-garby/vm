@@ -2,6 +2,7 @@
 #define H_VM_HEAP
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "object.h"
 #include "linked_list.h"
@@ -12,6 +13,10 @@
 typedef struct vm_heap {
     // a HEAP_SIZE length array of objects
     vm_obj items[VM_HEAP_SIZE];
+
+    // the "mark" flag for each object, as in "mark-and-sweep"
+    // TODO: this could be shrunk to VM_HEAP_SIZE/8
+    bool mark[VM_HEAP_SIZE];
 
     // a linked list containing all of the available heap addresses
     vm_ll_list free_addresses;

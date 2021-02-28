@@ -38,3 +38,7 @@ void vm_heap_release(vm_heap *heap, vm_heap_ptr p) {
     *data = p;
     vm_ll_append(&heap->free_addresses, data);
 }
+
+int vm_heap_gc(vm_heap *heap) {
+    return 0;
+}
